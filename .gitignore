@@ -1,0 +1,55 @@
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Java / Maven
+target/
+*.jar
+*.war
+*.class
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Gradle
+.gradle/
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.project
+.classpath
+nbproject/
+
+# OS
+.DS_Store
+Thumbs.db
+*~
+
+# Logs e temporários
+*.log
+logs/
+tmp/
+.cache/
+
+# Credenciais do Kindle — NUNCA versionar
+kindle/settings.lua
+*.jwt
+*.pem
+*.key
+koreader-settings.lua
+
+# Banco local do Kindle
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+*.db
+
+# Backend local
+/backend/local/

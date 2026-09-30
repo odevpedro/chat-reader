@@ -1,0 +1,4 @@
+# Contexto de build minimo para a imagem de teste: o plugin Lua nao precisa do
+# backend, das docs nem dos artefatos do Maven.
+*
+!Dockerfile.spec

@@ -1,0 +1,221 @@
+{
+  "schemaVersion": 1,
+  "generator": "chat-reader sample-data",
+  "exportedAt": "2026-09-29T12:00:00Z",
+  "chats": [
+    {
+      "id": "sample-spring-transactional",
+      "title": "Spring @Transactional na prática",
+      "createdAt": "2026-09-20T14:00:00Z",
+      "updatedAt": "2026-09-20T14:06:00Z",
+      "tags": ["Java", "Spring", "Backend"],
+      "messages": [
+        {
+          "role": "user",
+          "content": "Explique quando o `@Transactional` **não** funciona em chamadas de método dentro da mesma classe.",
+          "createdAt": "2026-09-20T14:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "O problema é o **proxy**: o Spring só intercepta chamadas que passam pelo bean gerenciado.\n\n```java\n@Service\npublic class PedidoService {\n    public void criar() {\n        this.confirmar(); // self-invocation: sem proxy, sem transação\n    }\n\n    @Transactional\n    public void confirmar() { /* ... */ }\n}\n```\n\nSoluções:\n\n1. Extrair `confirmar()` para outro bean e injetá-lo;\n2. Auto-injeção (`@Lazy`);\n3. `TransactionTemplate`.\n\nA ordem importa: a transação começa **antes** do método e faz commit depois que ele retorna.",
+          "createdAt": "2026-09-20T14:03:00Z"
+        },
+        {
+          "role": "user",
+          "content": "E o que acontece com exceções checadas?",
+          "createdAt": "2026-09-20T14:05:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Por padrão o rollback só ocorre para `RuntimeException` e `Error`. Exceções checadas **commitam** mesmo assim. Use `@Transactional(rollbackFor = Exception.class)` para mudar isso.",
+          "createdAt": "2026-09-20T14:06:00Z"
+        }
+      ]
+    },
+    {
+      "id": "sample-postgres-index",
+      "title": "Por que meu índice no Postgres não é usado?",
+      "createdAt": "2026-09-25T09:30:00Z",
+      "updatedAt": "2026-09-25T09:41:00Z",
+      "tags": ["Postgres", "Performance"],
+      "messages": [
+        {
+          "role": "user",
+          "content": "Criei um índice em `lower(email)` mas o `EXPLAIN` mostra *Seq Scan*. O que está errado?",
+          "createdAt": "2026-09-25T09:30:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Provavelmente a consulta não usa a **mesma expressão**. O índice em `lower(email)` só é usado por consultas com `WHERE lower(email) = ...`. Se você escreve `WHERE email ILIKE ...`, não casa.\n\nConfira com:\n\n```sql\nEXPLAIN (ANALYZE, BUFFERS) SELECT * FROM users WHERE lower(email) = lower($1);\n```\n\nCuidado com: comparação de tipos, collation e `OR` que impede o uso do índice.",
+          "createdAt": "2026-09-25T09:34:00Z"
+        },
+        {
+          "role": "user",
+          "content": "E `LIKE 'prefixo%'`?",
+          "createdAt": "2026-09-25T09:40:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Um índice B-tree comum ajuda apenas quando o padrão tem **prefixo fixo** e não começa com wildcard. Para busca textual de verdade, prefira `tsvector` + índice GIN — que é o que este projeto usa para busca (ver `docs/architecture.md`).",
+          "createdAt": "2026-09-25T09:41:00Z"
+        }
+      ]
+    },
+    {
+      "id": "sample-kindmarkdown",
+      "title": "Ler Markdown confortável no Kindle",
+      "createdAt": "2026-09-27T18:00:00Z",
+      "updatedAt": "2026-09-27T18:05:00Z",
+      "tags": ["Kindle", "KOReader", "UX"],
+      "messages": [
+        {
+          "role": "user",
+          "content": "Como deixar código e listas legíveis em uma tela e-ink?",
+          "createdAt": "2026-09-27T18:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Regras que funcionam bem no e-ink:\n\n- **Quebre linhas longas** de código em vez de rolar horizontalmente;\n- Use fonte monoespaçada de **tamanho confortável** (não micro);\n- Evite blocos muito altos: pagine o código como o texto;\n- Sem animações e sem refresh desnecessário (causa *flash* na tela);\n- Preserve os parágrafos: o cérebro lê melhor com respiro entre blocos.\n\n> O render é responsabilidade do cliente (Kindle); o backend entrega Markdown **cru**.",
+          "createdAt": "2026-09-27T18:05:00Z"
+        }
+      ]
+    },
+    {
+      "id": "sample-refatoracao-legado",
+      "title": "Refatoração de um monolito de 400 mil linhas",
+      "createdAt": "2026-08-14T09:00:00Z",
+      "updatedAt": "2026-08-14T11:20:00Z",
+      "tags": ["Refatoração", "Arquitetura", "Java", "Estudos"],
+      "messages": [
+        {
+          "role": "user",
+          "content": "Encontrei um monolito de ~400 mil linhas com 3 anos sem deploy. Qual a ordem das etapas para sair dele sem quebrar o produto?",
+          "createdAt": "2026-08-14T09:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "A ordem que menos quebra produto em legado é **caracterização antes de mudança**:\n\n1. **Travar o comportamento** com testes de caracterização (golden master) nos pontos críticos;\n2. **Isolar a borda**: criar módulos `build.gradle`/Maven modules em volta do que já tem teste;\n3. **Extrair, não reescrever**: cada extração vira um PR pequeno e reversível;\n4. **Duplicar, não migrar de uma vez**: o *strangler fig* pattern;\n5. Só então reduzir a duplicação.\n\n> Reescrever do zero parece mais rápido e quase sempre leva mais tempo: você perde o conhecimento que está no código, não no papel.",
+          "createdAt": "2026-08-14T09:08:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Como faço o golden master se as classes acoplam tudo estaticamente?",
+          "createdAt": "2026-08-14T09:12:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Três saídas, da menos invasiva para a mais:\n\n1. **Teste de caracterização pela API pública** — chama o método e compara com a saída esperada gravada. Não exige mudar nada do código de produção;\n2. **Harness de seam** — você introduz *seams* (injeção de dependência) minúsculos, um por vez, só para o teste;\n3. **Golden master no limite do processo** — grava requisição/resposta HTTP de verdade (o `WireMock` ajuda).\n\nComece pelo (1). Ele pega 80% do risco com 5% do esforço.",
+          "createdAt": "2026-08-14T09:20:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Mostra um exemplo de teste de caracterização.",
+          "createdAt": "2026-08-14T09:25:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "A ideia é: o teste **não afirma o que deve ser** — ele afirma o que **é hoje**. Depois de rodá-lo, você congela a saída.\n\n```java\n@Test\nvoid precoDescontoComCupomDeixa100() {\n    // arrange: o cenario real que encontramos em producao\n    var pedido = pedidoComItens(900.00).cupom(\"BLACKFRIDAY\").build();\n\n    // act\n    var total = calculadoraDePreco.calcular(pedido);\n\n    // assert: congelado a partir de 2026-08-14, quando isto e' o comportamento\n    assertThat(total).isEqualTo(900.00);\n}\n```\n\nO comentário é o que importa: diz **quando** e **por que** o valor foi congelado. Sem data, ninguém sabe se o teste ainda vale.",
+          "createdAt": "2026-08-14T09:33:00Z"
+        },
+        {
+          "role": "user",
+          "content": "E quando o teste de caracterização falha depois de uma refatoração legítima?",
+          "createdAt": "2026-08-14T09:40:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "É o momento mais valioso do método: **o teste acabou de te dar a lista do que mudou**. Aí a pergunta é: a mudança foi intencional?\n\n- **Foi**: você altera o golden master no mesmo PR, com a justificativa escrita. O histórico do teste passa a ser a documentação do comportamento ao longo do tempo;\n- **Não foi**: você encontrou uma regressão *antes* do deploy.\n\nO erro clássico é editar o golden master sem olhar. Aí o \"golden master\" vira só um snapshot que ninguém lê.",
+          "createdAt": "2026-08-14T09:52:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Como escolho a fronteira do primeiro módulo a extrair?",
+          "createdAt": "2026-08-14T10:05:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Procure a fronteira com o **maior acoplamento para fora e o menor para dentro**:\n\n| Sinal | Peso |\n|-------|-------|\n| Já tem teste de caracterização | forte a favor |\n| Depende de poucas tabelas | forte a favor |\n| Todo mundo chama (fan-in alto) | contra |\n| Muda toda semana | contra |\n\nNo e-commerce você quase sempre começa pelo catálogo de produtos: tem poucas dependências, muda com pouca frequência e é consumido por todo mundo. Comece por algo que ainda seja estável — não pelo que mais incomoda.",
+          "createdAt": "2026-08-14T10:18:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Quanto tempo isso leva na prática?",
+          "createdAt": "2026-08-14T10:30:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Honestamente: meses. O erro de estimativa é contar só a extração. O tempo real é:\n\n1. **Testes de caracterização** —anas, e é a maior parte;\n2. **Extrações** — semanas, uma por vez;\n3. **Recorte do legado** — só aqui o monolith encolhe.\n\nA pergunta útil não é \"quando acaba\", e sim **\"qual foi o primeiro deploy pelo monolito novo e com que risco?\"**. Se em 6 semanas você tem um módulo rodando em produção com rollback pronto, o projeto está no caminho certo.",
+          "createdAt": "2026-08-14T10:44:00Z"
+        },
+        {
+          "role": "user",
+          "content": "E a equipe? Todo mundo precisa entender isso?",
+          "createdAt": "2026-08-14T11:05:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "A regra prática do *strangler fig*: quem tem medo do monolito hoje precisa ver a primeira extração entrar em produção antes de confiar no plano. Demonstre com um módulo pequeno, com deploy e rollback visíveis.\n\nO antipadrão éolingir a migração numa plataforma só: ela fica pronta em 18 meses e o time perde a confiança no meio do caminho. A exceção é genuinely riesgável. Proponho este: **um módulo, um mês, deploy em produção com rollback testado**. No fim do mês, você tem uma prova, não uma proposta.",
+          "createdAt": "2026-08-14T11:20:00Z"
+        }
+      ]
+    },
+    {
+      "id": "sample-flyway-migracoes",
+      "title": "Flyway em projeto sem equipe de infra",
+      "createdAt": "2026-09-02T20:15:00Z",
+      "updatedAt": "2026-09-02T20:31:00Z",
+      "tags": ["Flyway", "Postgres", "Backend"],
+      "messages": [
+        {
+          "role": "system",
+          "content": "Você é um assistente de engenharia de software que responde de forma prática e direta.",
+          "createdAt": "2026-09-02T20:15:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Somos dois devs, sem DBA. Como adoptamos migrations sem virar mais uma coisa pra manter?",
+          "createdAt": "2026-09-02T20:16:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Migrations são o que **substitui** o DBA, não o que adiciona trabalho. Com dois devs, o setup mínimo que funciona:\n\n1. `flyway-core` e `ddl-auto: validate` — o Hibernate **nunca** cria tabela;\n2. Uma migration por mudança, nomeada `V<n>__<descrição>.sql`, com o número sequencial;\n3. `flyway validate` no CI: se alguém editou uma migration já aplicada, o build quebra.\n\nO erro que machuca: `ddl-auto: update` em produção. Ele altera o schema sem registro, e aí a migration futura roda em cima de um estado que ninguém sabe explicar.",
+          "createdAt": "2026-09-02T20:22:00Z"
+        },
+        {
+          "role": "tool",
+          "content": "grep: padrão 'V*__*.sql' encontrado: 14 arquivos em src/main/resources/db/migration",
+          "createdAt": "2026-09-02T20:24:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Como lidamos com uma coluna que precisa ser preenchida antes de virar `NOT NULL`?",
+          "createdAt": "2026-09-02T20:26:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Em três passos, porque o Postgres **não tem** \"add column with default\" sem reescrever a tabela:\n\n```sql\n-- 1. a coluna nasce opcional, com o valor de backfill no proprio DEFAULT\nALTER TABLE users ADD COLUMN deleted_at timestamptz DEFAULT NULL;\n\n-- 2. backfill em lotes (nunca um UPDATE único em tabela grande)\nUPDATE users SET deleted_at = updated_at WHERE deleted_at IS NULL AND id IN (\n  SELECT id FROM users WHERE deleted_at IS NULL LIMIT 10000\n);\n\n-- 3. só agora o DEFAULT some e a coluna fecha\nALTER TABLE users ALTER COLUMN deleted_at SET NOT NULL;\nALTER TABLE users ALTER COLUMN deleted_at DROP DEFAULT;\n```\n\n> Backfill em lote, com `LIMIT`, para não segurar lock por minutos.",
+          "createdAt": "2026-09-02T20:31:00Z"
+        }
+      ]
+    },
+    {
+      "id": "sample-datas-epoch",
+      "title": "Datas de export: epoch, ISO e data pura",
+      "createdAt": 1788220800,
+      "updatedAt": "2026-09-10",
+      "tags": ["Estudos", "Datas"],
+      "messages": [
+        {
+          "role": "user",
+          "content": "Meu export usa `create_time: 1788220800.0` mas outro usa `2026-09-10`. Como o importador lida com isso?",
+          "createdAt": 1788220800
+        },
+        {
+          "role": "assistant",
+          "content": "O importador normaliza os três formatos para o mesmo instante (ver `DateTimes` em `importer/domain`):\n\n| Entrada | Vira |\n|---------|------|\n| `1788220800.0` (epoch em segundos) | `2026-09-01T00:00:00Z` |\n| `2026-09-10T12:00:00Z` (ISO) | igual |\n| `2026-09-10` (data pura) | `2026-09-10T00:00:00Z` (UTC) |\n\nDuas regras evitam surpresa: **epoch assumido em segundos** (o ChatGPT usa segundos, não milissegundos) e **data sem hora vira meia-noite UTC**. Data ilegível não derruba a importação — o chat cai no `importedAt` e segue.",
+          "createdAt": "2026-09-10T00:00:00Z"
+        }
+      ]
+    }
+  ]
+}

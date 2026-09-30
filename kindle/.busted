@@ -1,0 +1,13 @@
+-- Configuracao do busted para o plugin. Sem isto, busted nao acha spec/.
+return {
+    default = {
+        ROOT = { "spec" },
+        pattern = "_spec%.lua$",
+        output = "utfTerminal",
+    },
+    ci = {
+        ROOT = { "spec" },
+        pattern = "_spec%.lua$",
+        output = "TAP",
+    },
+}
