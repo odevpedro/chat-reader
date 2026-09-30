@@ -1,0 +1,12 @@
+# Normaliza finais de linha no repositorio: os arquivos sao versionados com LF.
+# No Windows o checkout passa a usar CRLF, para o editor nao mostrar o arquivo
+# inteiro como modificado.
+* text=auto eol=lf
+
+# Binarios: nao tentar diff nem converter fim de linha.
+*.png binary
+*.jpg binary
+*.gif binary
+*.zip binary
+*.jar binary
+*.pdf binary
