@@ -1,4 +1,4 @@
-# Data Model — Chat Reader for Kindle
+# Data Model — chat-reader
 
 > Living documentation of the application's data model.
 > Updated whenever entities, attributes, access patterns, constraints, indexes,

@@ -1,4 +1,4 @@
-# System Feature Flows — Chat Reader for Kindle
+# System Feature Flows — chat-reader
 
 > Registro histórico das funcionalidades e de como elas percorrem o sistema.
 > Cada feature é acrescentada **ao final** do documento. Funcionalidades anteriores

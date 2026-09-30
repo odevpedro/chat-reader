@@ -14,7 +14,7 @@
     <groupId>com.example</groupId>
     <artifactId>chat-reader</artifactId>
     <version>0.1.0-SNAPSHOT</version>
-    <name>Chat Reader for Kindle</name>
+    <name>chat-reader</name>
     <description>Biblioteca pessoal de conversas com IA, otimizada para leitura no Kindle</description>
 
     <properties>
