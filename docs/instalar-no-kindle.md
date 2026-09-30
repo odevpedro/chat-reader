@@ -41,43 +41,82 @@ O servidor escuta na porta 8080. Descubra o IP do **seu computador** na rede loc
 - Linux: `ip addr | grep "inet "` (ignore a linha `127.0.0.1`);
 - macOS: `ipconfig getifaddr en0`.
 
-Guarde esse IP. Supondo `192.168.0.10`, o endereço do servidor é
-`http://192.168.0.10:8080`.
+Guarde esse IP. O endereço do servidor é `http://<esse-IP>:8080` — é este que
+você digita no Kindle no passo 9.
 
-Duas coisas que precisam ser verdade para o Kindle alcançar:
+O `docker-compose.yml` publica a porta em `0.0.0.0:8080`, ou seja, **qualquer máquina
+na rede alcança o servidor**, não só o Kindle. Isso é o padrão do Docker.
 
-1. **mesma rede Wi-Fi** — não funciona em cellular, VPN ou rede de visitante;
-2. **o firewall do seu computador libera a porta 8080**, ou o teste dá timeout em vez
-   de recusa. Se você usa `ufw`: `sudo ufw allow 8080/tcp`.
+Duas coisas precisam ser verdade para o Kindle alcançar:
 
-## 4. Ter uma senha de usuário
+1. **mesma rede Wi-Fi** — não funciona em celular, VPN ou rede de visitante;
+2. **o firewall do seu computador não barra a porta 8080**, ou o teste dá timeout em vez
+   de recusa.
 
-O servidor não aceita qualquer senha: o hash vem do `.env` local. Para um usuário de
-teste:
-
-```sh
-cd backend
-./mvnw spring-boot:run -Dspring-boot.run.profiles=local
-# em outro terminal, se o .env ainda nao tem:
-htpasswd -bnBC 10 usuario senha-forte
-```
-
-Copie a linha gerada para `CHAT_READER_USERS` no `.env` e reinicie o servidor.
-Verifique que responde:
+Sobre o firewall: se o seu não está ativo, não faça nada — a exposição fica restrita à
+sua rede doméstica, que é aceitável. Se está ativo, libere a faixa da sua rede:
 
 ```sh
-curl -s http://192.168.0.10:8080/actuator/health
+# a ordem importa: libere antes de negar, senão o backend sai do ar
+sudo ufw allow from 192.168.1.0/24 to any port 8080 proto tcp   # <- a faixa do SEU Wi-Fi
+sudo ufw deny 8080/tcp
+sudo ufw status numbered   # confira: 8080 liberado só para essa faixa
 ```
 
-Se isso não responder, o problema está aqui — ainda não é do Kindle.
+Para desfazer: `sudo ufw delete deny 8080/tcp`.
+
+## 4. Definir usuário e senha
+
+O `.env` do seu projeto já tem `CHAT_READER_USERNAME` e um hash de senha, e o backend já
+está no ar. **Se você já sabe a senha em texto** que corresponde a esse hash, pule
+para o passo 5.
+
+Se ainda não tem senha definida, crie uma:
+
+```sh
+./scripts/hash-password.sh
+```
+
+O script pergunta a senha sem eco e devolve uma linha como
+`CHAT_READER_PASSWORD_HASH='$2a$10$...'`. Abra o `.env` e troque o valor de
+`CHAT_READER_PASSWORD_HASH` por essa linha (sem o prefixo da variável, e sem as
+aspas simples se o seu editor atrapalhar). Depois:
+
+```sh
+docker compose up -d          # recria o container com o hash novo
+curl -s http://localhost:8080/actuator/health
+```
+
+**Anote a senha em texto num lugar seguro.** Você vai precisar dela no passo 5 e no
+passo 9, e não tem como recuperá-la a partir do hash. Esta é a parte realmente
+importante deste passo.
+
+Se o health check não responder, o problema está aqui — ainda não é do Kindle.
 
 ## 5. Importar conversas
 
 Pelo menos uma, para o plugin ter o que mostrar:
 
 ```sh
-./scripts/import.sh sample-data/chats.json
+CHAT_READER_USERNAME=odevpedro CHAT_READER_PASSWORD='a-senha-do-passo-4' \
+  ./scripts/import.sh sample-data/chats.json
 ```
+
+**Por que a senha aparece aqui.** O `import.sh` fala com a API, e a API exige token. Ele
+consegue um token fazendo login com `CHAT_READER_USERNAME` e `CHAT_READER_PASSWORD` do
+ambiente — a senha em **texto**. O `.env` guarda só o *hash* BCrypt, que serve para
+verificar a senha mas não para autenticá-la, então o import sozinho dá 401.
+
+Consequência prática: a senha em texto que você escolher no passo 4 é a mesma que vai
+para o Kindle no passo 9. Se você ainda não tem senha definida, crie uma agora — o
+script abaixo pergunta e não deixa a senha no histórico do shell:
+
+```sh
+./scripts/hash-password.sh
+```
+
+Anote a senha em texto num lugar seguro (gerenciador de senhas). Você vai precisar
+dela no passo 9 e não tem como recuperá-la do hash.
 
 ## 6. Gerar o pacote
 
@@ -126,7 +165,8 @@ partida seguinte.
 
 O menu **Configurações** do plugin pede, nesta ordem:
 
-1. **Endereço** — `http://192.168.0.10:8080` (o IP do computador, não `localhost`).
+1. **Endereço** — `http://<IP-do-seu-PC>:8080`. É o IP do **computador**, não
+   `localhost` e não o do Kindle.
 2. **Usuário** — o mesmo do passo 4.
 3. **Entrar / trocar senha** — digitar a senha troca por um token. O token fica salvo
    e expira sozinho; o plugin renova na próxima sincronização.
@@ -144,7 +184,7 @@ KOReader 2024.2
 Banco: /mnt/sd/koreader/data/chatreader.sqlite3
   conversas: 6 · mensagens: 32 · tags: 3 · bookmarks: 2
 
-Servidor: http://192.168.0.10:8080
+Servidor: http://192.168.1.73:8080
   usuário: odevpedro
   token: 57 min
 
@@ -167,7 +207,8 @@ está em outra máquina/porta. O texto exato importa: **"recusado"** é porta fe
 
 Firewall do computador ou rede diferente. No próprio Kindle, o endereço IP do
 diagnóstico precisa ser o do seu computador na rede local. Se o IP do Kindle for
-`192.168.15.x`, o seu computador tem que ser da mesma faixa.
+`192.168.15.x`, o seu computador tem que estar na mesma faixa — e o número que você
+digitou no endereço tem que ser o do computador, não o do Kindle.
 
 ### 401 na sincronização
 
