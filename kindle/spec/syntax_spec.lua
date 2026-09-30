@@ -15,9 +15,9 @@ local ARQUIVOS = {
     "client/sync.lua",
     "store/memory.lua",
     "store/sqlite.lua",
-    "ui/library.lua",
-    "ui/reader.lua",
-    "ui/settings.lua",
+    "views/library.lua",
+    "views/reader.lua",
+    "views/settings.lua",
 }
 
 describe("todo arquivo do plugin compila", function()
@@ -30,15 +30,29 @@ describe("todo arquivo do plugin compila", function()
 end)
 
 describe("a UI nao carrega o que nao precisa", function()
-    it("ui/ e client/library.lua nao dependem de modulos nativos do KOReader", function()
-        -- rapidjson e o JSON nativo: um require no topo de um arquivo de logica
-        -- quebraria o container de teste e nao o aparelho, que e o caminho errado
-        -- para descobrir o problema.
-        for _, arquivo in ipairs({ "ui/library.lua", "ui/reader.lua", "ui/settings.lua",
+    it("views/ e client/library.lua so usam modulos nativos dentro de funcao", function()
+        -- rapidjson e o JSON nativo do KOReader. Um require no topo do arquivo
+        -- quebraria o container de teste e nao o aparelho — o caminho errado para
+        -- descobrir o problema. Dentro de uma funcao, so e carregado se a tela
+        -- realmente precisar (e o ui_spec cobre esse caminho com stub).
+        --
+        -- A excecao e views/settings.lua, que le o JWT para mostrar quanto tempo ele
+        -- ainda vale: la o require precisa ser tardio, nao ausente.
+        for _, arquivo in ipairs({ "views/library.lua", "views/reader.lua",
                                    "client/library.lua", "client/positions.lua" }) do
             local fonte = assert(io.open(arquivo)):read("*a")
             assert.is_nil(fonte:find("rapidjson", 1, true), arquivo .. " puxa rapidjson")
             assert.is_nil(fonte:find('require("lfs")', 1, true), arquivo .. " puxa lfs")
+        end
+
+        -- views/settings.lua: usa rapidjson para ler a validade do JWT, mas so pode
+        -- ser dentro de uma funcao — no topo, quebraria o container de teste.
+        local fonte = assert(io.open("views/settings.lua")):read("*a")
+        for linha in fonte:gmatch("[^\n]+") do
+            if linha:find("rapidjson", 1, true) then
+                assert.is_truthy(linha:match("^%s"),
+                    "views/settings.lua tem require de rapidjson fora de funcao: " .. linha)
+            end
         end
     end)
 end)

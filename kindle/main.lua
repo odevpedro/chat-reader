@@ -8,7 +8,7 @@
 --   * main.lua devolve a classe, com `name` e `addToMainMenu`;
 --   * a instancia recebe `ui` (o FileManager) e se registra no menu;
 --   * o pluginloader coloca o diretorio do plugin no package.path, entao
---     require("client.sync"), require("ui.reader") resolvem para ca.
+--     require("client.sync"), require("views.reader") resolvem para ca.
 --
 -- Este arquivo e a cola entre o KOReader e o resto: quem manda no conteudo e o
 -- store, quem manda no protocolo e o client/sync.lua, e a UI so desenha.
@@ -24,9 +24,15 @@ local client_http = require("client.http")
 local client_sync = require("client.sync")
 local positions = require("client.positions")
 local settings_mod = require("client.settings")
-local library_ui = require("ui.library")
-local reader_ui = require("ui.reader")
-local settings_ui = require("ui.settings")
+local library_ui = require("views.library")
+local reader_ui = require("views.reader")
+local settings_ui = require("views.settings")
+
+-- Versao do plugin e do contrato de dados com o servidor. A do plugin mora aqui
+-- para o diagnostico mostrar; a do contrato tambem em metadata.lua, para o
+-- gerenciador de plugins do KOReader mostrar sem abrir o plugin.
+local PLUGIN_VERSION = "0.1.0"
+local DATA_CONTRACT = "1"
 
 local ChatReader = WidgetContainer:extend{
     name = "chatreader",
@@ -46,6 +52,8 @@ function ChatReader:init()
     self.positions = positions.new(LuaSettings:open(
         DataStorage:getSettingsDir() .. "/chatreader_reader.lua"))
     self.reader = nil
+    -- As versoes sao do plugin; as telas as consultam por M.set_versions.
+    settings_ui.set_versions(PLUGIN_VERSION, DATA_CONTRACT)
 end
 
 function ChatReader:addToMainMenu(menu_items)

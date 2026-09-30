@@ -54,6 +54,10 @@ function Store:count(what)
     if what == "chats" then return count_keys(self.chats) end
     if what == "tags" then return count_keys(self.tags) end
     if what == "bookmarks" then return count_keys(self.bookmarks) end
+    -- `favorites` nao existe: favoritos sao um flag em `chats`, nao uma tabela, e por
+    -- isso `COUNTS` no store SQLite tambem nao tem a chave. Contar exigiria percorrer
+    -- todas as conversas — o diagnostico mostra o total de conversas e deixa o filtro
+    -- "Favoritos" do menu fazer o trabalho.
     if what == "messages" then
         local n = 0
         for _, chat in pairs(self.chats) do n = n + #chat.messages end

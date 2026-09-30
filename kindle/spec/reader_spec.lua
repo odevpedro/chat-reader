@@ -1,7 +1,7 @@
 -- Navegacao do leitor, sem o widget do KOReader: eh logica pura (janela de mensagens,
 -- onde parou, limite da conversa) que so funcionaria no aparelho se nao tivesse spec.
 
-local reader_ui = require("ui.reader")
+local reader_ui = require("views.reader")
 local sync = require("client.sync")
 
 -- Conversa de 95 mensagens: mais que a janela de 40, para exercitar a paginacao.
@@ -23,7 +23,7 @@ local function fake_positions(initial)
     return p
 end
 
-describe("ui/reader", function()
+describe("views/reader", function()
     local store
 
     before_each(function()

@@ -14,6 +14,15 @@ local M = {}
 
 local APP = "Chat Reader"
 
+-- Preenchido pelo main.lua: as versoes vivem em um lugar so.
+local PLUGIN_VERSION = nil
+local DATA_CONTRACT = nil
+
+function M.set_versions(plugin_version, data_contract)
+    PLUGIN_VERSION = plugin_version
+    DATA_CONTRACT = data_contract
+end
+
 local function info(text)
     UIManager:show(InfoMessage:new{ text = text })
 end
@@ -118,6 +127,62 @@ function M.confirm_wipe(ctx)
     })
 end
 
+-- Diagnóstico: uma unica tela que responde "o que esta acontecendo?" quando algo
+-- da errado no aparelho.
+--
+-- No container de teste e no seu PC voce ve o erro no terminal. No Kindle, nao: o
+-- plugin falha em silencio e voce ve um menu vazio ou uma tela branca. Este menu
+-- junta as seis perguntas que fazem falta para diagnosticar sem SSH — versao do
+-- plugin, do KOReader e do backend, caminho do banco, estado da config, fila de
+-- escritas pendentes, e ultima falha de sync registrada.
+function M.show_diagnostics(ctx)
+    local store = ctx:get_store()
+    local settings = ctx.settings
+    local url = settings:base_url()
+    local token = settings:token()
+
+    -- O token e' um JWT: o segundo segmento (payload) diz quando expira, sem
+    -- precisar decodificar assinatura nem fazer round-trip ao servidor.
+    local expira = "sem token"
+    if token and token ~= "" then
+        local payload = token:match("^[^.]+%.([^.]+)%.")
+        expira = "presente (nao deu para ler a validade)"
+        if payload then
+            local ok, json = pcall(function()
+                return require("rapidjson").decode(base64_decode_url(payload))
+            end)
+            if ok and type(json) == "table" and json.exp then
+                expira = tostring(math.floor((json.exp - os.time()) / 60)) .. " min"
+            end
+        end
+    end
+
+    local linhas = {
+        "Chat Reader " .. (PLUGIN_VERSION or "?") .. " · contrato " .. (DATA_CONTRACT or "?"),
+        "KOReader " .. (ctx.ui and ctx.ui.version and ctx.ui.version or "?"),
+        "",
+        "Banco: " .. ctx:db_path(),
+        "  conversas: " .. store:count("chats")
+            .. " · mensagens: " .. store:count("messages")
+            .. " · favoritos: " .. store:count("favorites")
+            .. " · bookmarks: " .. store:count("bookmarks"),
+        "",
+        "Servidor: " .. url,
+        "  usuário: " .. (settings:username() ~= "" and settings:username() or "(nao definido)"),
+        "  token: " .. expira,
+        "",
+        "Fila de escritas: " .. store:count_local() .. " pendente(s)",
+    }
+
+    local last_error = ctx.last_error
+    if last_error then
+        linhas[#linhas + 1] = ""
+        linhas[#linhas + 1] = "Ultimo erro: " .. tostring(last_error)
+    end
+
+    info(table.concat(linhas, "\n"))
+end
+
 -- ---------------------------------------------------------------------------
 -- Menu
 -- ---------------------------------------------------------------------------
@@ -148,6 +213,10 @@ function M.show(ctx)
         {
             text = "Apagar biblioteca local",
             callback = function() M.confirm_wipe(ctx) end,
+        },
+        {
+            text = "Diagnóstico",
+            callback = function() M.show_diagnostics(ctx) end,
         },
     }
     UIManager:show(Menu:new{ title = APP, item_table = items })

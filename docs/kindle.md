@@ -221,11 +221,33 @@ Duas coisas que a fase offline faz de propósito, porque são as que a tornam um
   um `401` provaria que o servidor estava de pé e o teste não diria nada sobre offline;
 - o cliente exige falha de **conexão** (`code == 0`), não qualquer erro HTTP.
 
+### A UI, executada com stubs do KOReader
+
+`spec/ui_spec.lua` carrega `main.lua` e as três telas com stubs dos módulos do KOReader
+(`spec/koreader_stub.lua`) e **executa** o caminho que o pluginloader executa no
+aparelho: registra no menu, abre a biblioteca, monta o `TextViewer`, aperta Favoritar e
+Bookmark, vira página, abre as configurações.
+
+O que isso compra: um `require` de módulo inexistente, um campo errado num
+`ButtonDialog:new` ou um callback que fecha um widget já fechado aparecem em
+milissegundos no container, com stack trace — em vez de tela branca no Kindle, sem
+nenhum log. Os campos aceitos por cada widget foram conferidos contra
+`frontend/ui/widget/*.lua` do upstream (`InputDialog` usa `buttons`, `TextViewer` usa
+`buttons_table` + `add_default_buttons`, `ConfirmBox` usa `ok_text`/`ok_callback`).
+
+O que não compra: e-ink de verdade — contraste, refresh, gestos de página, teclado.
+
 ### Em dispositivo
 
-1. **Spike de integração KOReader** — fluxo real mínimo (abrir banco, criar menu,
-   navegar) no emulador/dispositivo, documentado aqui nesta seção. Este é o único item
-   que falta e ele **não** pode ser substituído por nenhum dos testes acima.
+1. **Teste no aparelho** — passo a passo em
+   [instalar-no-kindle.md](instalar-no-kindle.md). Este é o único item que falta e
+   ele **não** pode ser substituído por nenhum dos testes acima.
+
+`./kindle/scripts/package.sh` monta o `chatreader.koplugin` e faz duas conferências
+que valem mais do que parecem: os `require` do `main.lua` contra o **conteúdo do
+pacote** (um require quebrado passa em todo spec, que roda do repo), e o carregamento
+do pacote **de fora do repo**, num container separado. O `spec/` e o `scripts/` não
+vão para o aparelho.
 
 Não há renderer de Markdown próprio: o leitor usa o `TextViewer` do KOReader com
 `text_format = "md"`, que já reutiliza o mdToHtml + crengine usado para abrir .md —

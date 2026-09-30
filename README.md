@@ -1,4 +1,4 @@
-# Chat Reader for Kindle
+# chat-reader
 
 Transforme suas conversas com IA em uma **biblioteca pessoal de leitura no Kindle**.
 
@@ -10,10 +10,11 @@ O fluxo é: importar → sincronizar → ler no Kindle → favoritar/bookmark �
 ## Estado
 
 🚧 **Etapas 5 e 6 concluídas; falta o passo em dispositivo.** A verificação das APIs
-reais (R5) está feita e `kindle/` está escrito, com **117 specs** verdes no container:
+reais (R5) está feita e `kindle/` está escrito, com **131 specs** verdes no container:
 store SQLite com migração, sync transacional, escritas offline com outbox, lógica pura
-de biblioteca/leitor, adapter HTTP e settings, e a UI inteira (`main.lua`, biblioteca,
-leitor offline-first, configuração).
+de biblioteca/leitor, adapter HTTP e settings, e — desde o último commit — as telas
+**executando de verdade** sob stubs do KOReader (`spec/ui_spec.lua`), com os campos de
+cada widget conferidos contra a fonte do upstream.
 
 Dois testes rodam contra o backend **real**, não contra stub:
 
@@ -21,8 +22,12 @@ Dois testes rodam contra o backend **real**, não contra stub:
 - `./kindle/scripts/offline.sh` → `offline ok` (backend derrubado, biblioteca e
   escritas continuam funcionando, fila drena quando ele volta).
 
+Para instalar no aparelho: **[docs/instalar-no-kindle.md](docs/instalar-no-kindle.md)**.
+`./kindle/scripts/package.sh` monta o `.koplugin` e verifica que ele carrega fora do
+repo — um `require` quebrado passa nos specs e só viraria tela branca no Kindle.
+
 O único item aberto é o plugin rodar no KOReader de verdade (emulador/dispositivo),
-que nenhum teste em container substitui.
+que nenhum teste em container substitui: e-ink, gestos de página, teclado.
 
 | Etapa | Status | Documento |
 |-------|--------|-----------|
@@ -54,6 +59,7 @@ trazendo as escritas feitas offline (favoritos e bookmarks).
 | [docs/importers.md](docs/importers.md) | Schema de importação, detecção, como criar adapters |
 | [docs/sync-protocol.md](docs/sync-protocol.md) | Protocolo de delta sync, conflitos, resiliência |
 | [docs/kindle.md](docs/kindle.md) | Cliente KOReader: desenho, SQLite, performance, testes |
+| [docs/instalar-no-kindle.md](docs/instalar-no-kindle.md) | Passo a passo para instalar no aparelho e diagnosticar |
 | [docs/risks-and-plan.md](docs/risks-and-plan.md) | Riscos, plano por etapa, verificação de APIs |
 | [docs/system-feature-flows.md](docs/system-feature-flows.md) | Fluxo de cada feature: entrada, camadas, erros, decisões |
 | [docs/data-model.md](docs/data-model.md) | Modelo persistido: entidades, atributos, índices, consistência, privacidade |
