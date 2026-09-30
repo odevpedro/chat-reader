@@ -55,6 +55,8 @@ trazendo as escritas feitas offline (favoritos e bookmarks).
 | [docs/sync-protocol.md](docs/sync-protocol.md) | Protocolo de delta sync, conflitos, resiliência |
 | [docs/kindle.md](docs/kindle.md) | Cliente KOReader: desenho, SQLite, performance, testes |
 | [docs/risks-and-plan.md](docs/risks-and-plan.md) | Riscos, plano por etapa, verificação de APIs |
+| [docs/system-feature-flows.md](docs/system-feature-flows.md) | Fluxo de cada feature: entrada, camadas, erros, decisões |
+| [docs/data-model.md](docs/data-model.md) | Modelo persistido: entidades, atributos, índices, consistência, privacidade |
 | [docs/decisions/](docs/decisions/) | ADRs |
 
 ### ADRs

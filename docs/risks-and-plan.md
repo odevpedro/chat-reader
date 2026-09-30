@@ -90,7 +90,7 @@ sync/          domain/{ChangeType, SyncChange, ChangeLog(port), LocalChange, Syn
                application/{SyncService, ChangeLogWriter, SyncProperties}
                infrastructure/{ChangeLogEntity, ChangeLogJpaRepository, ChangeLogAdapter,
                                 SyncChangeMapper, SyncDtos, SyncController}
-security/      {JwtService, TokenAuthFilter, RateLimiter, CurrentUser}
+security/      {JwtService, TokenAuthFilter, CurrentUser, AuthProperties, AuthController}
 ```
 
 ### Dependências do backend (mínimas)
