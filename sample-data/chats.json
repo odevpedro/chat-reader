@@ -1,14 +1,49 @@
 {
   "schemaVersion": 1,
   "generator": "chat-reader sample-data",
-  "exportedAt": "2026-09-29T12:00:00Z",
+  "exportedAt": "2026-10-06T08:18:00Z",
   "chats": [
+    {
+      "id": "sample-bom-dia",
+      "title": "oi, bom dia",
+      "createdAt": "2026-10-06T08:15:00Z",
+      "updatedAt": "2026-10-06T08:17:00Z",
+      "tags": [
+        "Teste"
+      ],
+      "messages": [
+        {
+          "role": "user",
+          "content": "oi, bom dia! :)",
+          "createdAt": "2026-10-06T08:15:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "oi! bom dia! tudo bem? em que posso ajudar?",
+          "createdAt": "2026-10-06T08:15:30Z"
+        },
+        {
+          "role": "user",
+          "content": "quero testar esse leitor no kindle",
+          "createdAt": "2026-10-06T08:16:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "boa! é só sincronizar a biblioteca e abrir esta conversa. cada mensagem mostra quem fala: Você ou Assistente.",
+          "createdAt": "2026-10-06T08:17:00Z"
+        }
+      ]
+    },
     {
       "id": "sample-spring-transactional",
       "title": "Spring @Transactional na prática",
       "createdAt": "2026-09-20T14:00:00Z",
       "updatedAt": "2026-09-20T14:06:00Z",
-      "tags": ["Java", "Spring", "Backend"],
+      "tags": [
+        "Java",
+        "Spring",
+        "Backend"
+      ],
       "messages": [
         {
           "role": "user",
@@ -37,7 +72,10 @@
       "title": "Por que meu índice no Postgres não é usado?",
       "createdAt": "2026-09-25T09:30:00Z",
       "updatedAt": "2026-09-25T09:41:00Z",
-      "tags": ["Postgres", "Performance"],
+      "tags": [
+        "Postgres",
+        "Performance"
+      ],
       "messages": [
         {
           "role": "user",
@@ -66,7 +104,11 @@
       "title": "Ler Markdown confortável no Kindle",
       "createdAt": "2026-09-27T18:00:00Z",
       "updatedAt": "2026-09-27T18:05:00Z",
-      "tags": ["Kindle", "KOReader", "UX"],
+      "tags": [
+        "Kindle",
+        "KOReader",
+        "UX"
+      ],
       "messages": [
         {
           "role": "user",
@@ -85,7 +127,12 @@
       "title": "Refatoração de um monolito de 400 mil linhas",
       "createdAt": "2026-08-14T09:00:00Z",
       "updatedAt": "2026-08-14T11:20:00Z",
-      "tags": ["Refatoração", "Arquitetura", "Java", "Estudos"],
+      "tags": [
+        "Refatoração",
+        "Arquitetura",
+        "Java",
+        "Estudos"
+      ],
       "messages": [
         {
           "role": "user",
@@ -154,7 +201,7 @@
         },
         {
           "role": "assistant",
-          "content": "A regra prática do *strangler fig*: quem tem medo do monolito hoje precisa ver a primeira extração entrar em produção antes de confiar no plano. Demonstre com um módulo pequeno, com deploy e rollback visíveis.\n\nO antipadrão éolingir a migração numa plataforma só: ela fica pronta em 18 meses e o time perde a confiança no meio do caminho. A exceção é genuinely riesgável. Proponho este: **um módulo, um mês, deploy em produção com rollback testado**. No fim do mês, você tem uma prova, não uma proposta.",
+          "content": "A regra prática do *strangler fig*: quem tem medo do monolito hoje precisa ver a primeira extração entrar em produção antes de confiar no plano. Demonstre com um módulo pequeno, com deploy e rollback visíveis.\n\nO antipadrão é engolir a migração numa plataforma só: ela fica pronta em 18 meses e o time perde a confiança no meio do caminho. A exceção é quando ela é genuinamente arriscada. Proponho este: **um módulo, um mês, deploy em produção com rollback testado**. No fim do mês, você tem uma prova, não uma proposta.",
           "createdAt": "2026-08-14T11:20:00Z"
         }
       ]
@@ -164,7 +211,11 @@
       "title": "Flyway em projeto sem equipe de infra",
       "createdAt": "2026-09-02T20:15:00Z",
       "updatedAt": "2026-09-02T20:31:00Z",
-      "tags": ["Flyway", "Postgres", "Backend"],
+      "tags": [
+        "Flyway",
+        "Postgres",
+        "Backend"
+      ],
       "messages": [
         {
           "role": "system",
@@ -173,7 +224,7 @@
         },
         {
           "role": "user",
-          "content": "Somos dois devs, sem DBA. Como adoptamos migrations sem virar mais uma coisa pra manter?",
+          "content": "Somos dois devs, sem DBA. Como adotamos migrations sem virar mais uma coisa pra manter?",
           "createdAt": "2026-09-02T20:16:00Z"
         },
         {
@@ -203,7 +254,10 @@
       "title": "Datas de export: epoch, ISO e data pura",
       "createdAt": 1788220800,
       "updatedAt": "2026-09-10",
-      "tags": ["Estudos", "Datas"],
+      "tags": [
+        "Estudos",
+        "Datas"
+      ],
       "messages": [
         {
           "role": "user",
@@ -214,6 +268,438 @@
           "role": "assistant",
           "content": "O importador normaliza os três formatos para o mesmo instante (ver `DateTimes` em `importer/domain`):\n\n| Entrada | Vira |\n|---------|------|\n| `1788220800.0` (epoch em segundos) | `2026-09-01T00:00:00Z` |\n| `2026-09-10T12:00:00Z` (ISO) | igual |\n| `2026-09-10` (data pura) | `2026-09-10T00:00:00Z` (UTC) |\n\nDuas regras evitam surpresa: **epoch assumido em segundos** (o ChatGPT usa segundos, não milissegundos) e **data sem hora vira meia-noite UTC**. Data ilegível não derruba a importação — o chat cai no `importedAt` e segue.",
           "createdAt": "2026-09-10T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "id": "sample-oom-producao",
+      "title": "Debugar um OutOfMemoryError em produção sem pânico",
+      "createdAt": "2026-09-28T09:00:00Z",
+      "updatedAt": "2026-10-01T09:00:00Z",
+      "tags": [
+        "Java",
+        "Produção",
+        "Debug"
+      ],
+      "messages": [
+        {
+          "role": "user",
+          "content": "Meu serviço estourou `OutOfMemoryError: Java heap space` às 3h da manhã. Por onde começo? Por favor, sem \"sobe a memória da JVM\".",
+          "createdAt": "2026-09-28T09:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "O primeiro passo é **parar de aumentar o heap**. Na maioria dos casos o heap não é o problema, é o sintoma. O segundo passo é tirar um heap dump **com o GC log rodando**, senão o dump mostra o momento errado.\n\nComando que salva:\n\n```bash\njcmd <pid> GC.heap_dump /tmp/heap_$(date +%F).hprof\n```\n\nE o GC log continua capturando depois do crash:\n\n```bash\njava -Xlog:gc*:file=gc.log:time,uptime,level,tags\n```",
+          "createdAt": "2026-09-28T17:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "O dump tem 3 GB de strings. Só 20% do objeto. Como achar quem aloca?",
+          "createdAt": "2026-09-29T01:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Strings ocupando 80% costumam ser **duplicação**, não leak: cada parse de JSON/XML recria a mesma chave. O que responde é o **retained size** por linha de causa e o caminho até as raízes:\n\n- **Eclipse MAT**: `Dominator Tree` + `Path to GC Roots`;\n- **JFR**: `ObjectAllocationInNewTLAB` para ver o call site;\n- Se for *pattern*: cache com `KeyedLock` e dicionários internados.\n\n> Regra: nunca olhe o *shallow size* — ele esconde quem segura a referência.",
+          "createdAt": "2026-09-29T09:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Achei a causa: `HashMap` sem `equals` no domínio acumulando chaves iguais. Como distribuir o fix sem novo deploy?",
+          "createdAt": "2026-09-29T17:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Hotfix sem deploy é uma **bala de prata que quase sempre volta**: hotpatch de `ClassLoader` funciona, mas você perde o artefato comprovado. O caminho honesto:\n\n1. `git bisect` no commit que trocou o domínio;\n2. Fix pontual no `equals`/`hashCode`;\n3. Teste de regressão que **falhe antes** e passe depois;\n4. Deploy normal na janela seguinte.\n\nO fix real é o teste reproduzindo o cenário: 1 milhão de linhas com a mesma chave lógica.",
+          "createdAt": "2026-09-30T01:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "E se a causa for um cache que cresce sem limite? Existe regra de ouro?",
+          "createdAt": "2026-09-30T09:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Toda cache que **não foi especificada com tamanho máximo e eviction** é, na prática, um leak. Três avenidas:\n\n- `Caffeine` com `maximumSize` + `expireAfterAccess`;\n- Se o crescimento é por usuário: entidade por sessão, nunca global;\n- Se é dado de relatório: **temporária**, na thread que consome.\n\nE o teste que relembra: um teste de memória que enche parte do heap e afirma que, após `weakref`, o GC libera.",
+          "createdAt": "2026-09-30T17:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Como esse diagnóstico vira automatizado? Não quero acordar de novo às 3h da manhã.",
+          "createdAt": "2026-10-01T01:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Automatize a **prova**, não a correção:\n\n```yaml\n# alerta que pega a tendencia, nao o estouro\nalert:\n  if: jvm_heap_used_percentage > 85%\n  for: 15m\n```\n\n```java\n// e um resumo dos caches no endpoint interno\n@Override public String toString() {\n    return \"cache(entries=\" + cache.size() + \")\";\n}\n```\n\nJunto com `HeapDumpOnOutOfMemoryError` e GC log, a próxima madrugada vira um ticket de 10 minutos.",
+          "createdAt": "2026-10-01T09:00:00Z"
+        }
+      ]
+    },
+    {
+      "id": "sample-leitura-eink",
+      "title": "Ler conversas técnicas no e-ink sem cansar os olhos",
+      "createdAt": "2026-09-28T09:00:00Z",
+      "updatedAt": "2026-09-30T17:00:00Z",
+      "tags": [
+        "UX",
+        "e-ink",
+        "Leitura"
+      ],
+      "messages": [
+        {
+          "role": "user",
+          "content": "Por que depois de meia hora de leitura técnica no Kindle sinto os olhos cansados, se a tela não pisca?",
+          "createdAt": "2026-09-28T09:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "O e-ink não cansa pela luz direta, e sim pela **falta de respiro tipográfico**. Texto muito denso, linha muito comprida e justificada demais fazem o olho perder a trilha da próxima linha. Duas correções baratas:\n\n- **Entrelinha maior**: leading de 1.4–1.6x o corpo;\n- **Margens generosas**: o olho precisa de onde *descansar* na lateral.\n\n> Não é a tela que cansa; é o *tracking* visual.",
+          "createdAt": "2026-09-28T17:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Código justificado fica com buracos. Existe regra para blocos de código técnico?",
+          "createdAt": "2026-09-29T01:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Blocos de código nunca se justificam — quebram as colunas e o alinhamento. Regras que funcionam:\n\n1. **Fonte monoespaçada** e do mesmo tamanho do texto (16–20px);\n2. **Sem auto-justify**: alinhamento à esquerda, quebra só em espaço;\n3. Recuo de 2 espaços para o olho detectar o bloco como *unidade*;\n4. Comentário no código com contraste igual ao texto.\n\nA prioridade não é \"renderizar bonito\", é o leitor **não parar** para decifrar a estrutura.",
+          "createdAt": "2026-09-29T09:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "E itálico e negrito no e-ink? Alguns dizem que nem deveriam existir.",
+          "createdAt": "2026-09-29T17:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Negrito sobrevive porque no e-ink é **peso de forma** — funciona tão bem quanto no papel. O itálico é o problemático: em fontes serifadas fica fino e some em telas de baixo contraste. Para texto técnico, prefira **ênfase por estrutura** (lista, caixa, indentação) a itálico em massa.\n\nNa prática para *este* plugin: mensagem de usuário é texto simples, resposta do assistente é texto estruturado — e **1 * 1 não deve virar itálico**.",
+          "createdAt": "2026-09-30T01:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Vale a pena usar o modo A2 (menos contraste) para virar página mais rápido?",
+          "createdAt": "2026-09-30T09:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Modo A2 troca contraste por velocidade e é um péssimo negócio para prosa: você percebe o *ghosting* e o olho reclama. O truque que funciona é o **flash a cada N páginas**, não por página, e texto escuro em fundo claro (nunca inverter). Guarde o A2 para gestos de rolagem contínua, que são raros nesta leitura.",
+          "createdAt": "2026-09-30T17:00:00Z"
+        }
+      ]
+    },
+    {
+      "id": "sample-window-functions",
+      "title": "Window functions no Postgres sem decorar sintaxe",
+      "createdAt": "2026-09-28T09:00:00Z",
+      "updatedAt": "2026-10-02T01:00:00Z",
+      "tags": [
+        "SQL",
+        "Postgres",
+        "Backend"
+      ],
+      "messages": [
+        {
+          "role": "user",
+          "content": "Tenho uma tabela de pedidos. Quero o total acumulado por cliente ordenado por data. `GROUP BY` não resolve. O que usar?",
+          "createdAt": "2026-09-28T09:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Você quer **window functions**: a janela calcula sobre um conjunto *sem agrupar linhas*.\n\n```sql\nSELECT cliente_id,\n       data,\n       SUM(valor) OVER (\n           PARTITION BY cliente_id\n           ORDER BY data\n           ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\n       ) AS acumulado\nFROM pedidos;\n```\n\nA diferença pro `GROUP BY`: aqui **cada linha continua existindo**, e o `SUM` é computado por janela.",
+          "createdAt": "2026-09-28T17:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "A ordem do `ORDER BY` dentro do `OVER` importa para o acumulado?",
+          "createdAt": "2026-09-29T01:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Sim, e é a fonte nº1 de bug. O `ORDER BY` do `OVER` **define o frame**: sem ele o acumulado soma o cliente inteiro em cada linha. E o frame padrão tem pegadinha:\n\n```sql\n-- frame padrao com ORDER BY: do primeiro registro ate a linha atual\nSUM(valor) OVER (PARTITION BY cliente_id ORDER BY data)\n```\n\nSem `ROWS BETWEEN ...`, o Postgres assume `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` — com empate na ordenação, o resultado muda.",
+          "createdAt": "2026-09-29T09:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Como pego \"o último pedido de cada cliente\" sem subquery gigante?",
+          "createdAt": "2026-09-29T17:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "`ROW_NUMBER()` numa subquery é o padrão legível:\n\n```sql\nSELECT *\nFROM (\n    SELECT p.*,\n           ROW_NUMBER() OVER (PARTITION BY cliente_id ORDER BY data DESC) AS rn\n    FROM pedidos p\n) t\nWHERE t.rn = 1;\n```\n\nAtenção ao desempate: data empatada exige uma coluna extra no `ORDER BY`, senão `rn` é arbitrário.",
+          "createdAt": "2026-09-30T01:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "E comparação com o pedido anterior do mesmo cliente (delta)? Existe função feita pra isso?",
+          "createdAt": "2026-09-30T09:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "`LAG()` e `LEAD()` acessam linhas *vizinhas* da janela:\n\n```sql\nSELECT cliente_id,\n       data,\n       valor,\n       valor - LAG(valor) OVER (PARTITION BY cliente_id ORDER BY data) AS delta\nFROM pedidos;\n```\n\n> `LAG(x)` na primeira linha de um cliente devolve `NULL` — use `COALESCE` quando o delta precisar virar 0.",
+          "createdAt": "2026-09-30T17:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Meu `EXPLAIN` mostrou um sort extra que não esperava. Window function sempre ordena?",
+          "createdAt": "2026-10-01T01:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Toda janela com `ORDER BY` precisa de ordenação — o Postgres escolhe um `Sort` no plano quando não há índice que já entregue as linhas nessa ordem. Se a query é frequente e o dataset é grande, o índice `(cliente_id, data)` elimina o sort. E se a janela não precisa de ordem (ex.: `COUNT(*) OVER (PARTITION BY cliente_id)`), tire o `ORDER BY` do `OVER` — sem ele não há frame e o plano fica mais barato.",
+          "createdAt": "2026-10-01T09:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "`RANK()` vs `DENSE_RANK()`: qual uso para \"top 3 por grupo\"?",
+          "createdAt": "2026-10-01T17:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Depende do que você quer com **empates**:\n\n- `RANK()` pula: 1, 1, 3;\n- `DENSE_RANK()` não pula: 1, 1, 2.\n\nPara \"top 3\" o comum é `RANK()` (empate conta como posição); para \"os 3 valores distintos mais altos\" use `DENSE_RANK()`. `WHERE rn <= 3` com `RANK()` pode devolver 4 linhas em empate — é comportamento, não bug.",
+          "createdAt": "2026-10-02T01:00:00Z"
+        }
+      ]
+    },
+    {
+      "id": "sample-maratona-java21",
+      "title": "Maratona de revisão: Java 21 (46 mensagens, para paginar o leitor)",
+      "createdAt": "2026-09-28T09:00:00Z",
+      "updatedAt": "2026-10-13T09:00:00Z",
+      "tags": [
+        "Java",
+        "Revisão",
+        "Estudos"
+      ],
+      "messages": [
+        {
+          "role": "user",
+          "content": "Roteiro de revisão: Java 21, do básico ao dia a dia. Pode me interrogar tópico por tópico?",
+          "createdAt": "2026-09-28T09:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Claro. Regras do jogo: uma pergunta minha, você responde em 2 ou 3 frases, eu corrijo sem dar a resposta antes.\n\nComece: qual a diferença prática entre `record`, `class` e a velha \"classe que só segura dado\"?",
+          "createdAt": "2026-09-28T17:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "record gera equals/hashCode/toString e é imutável por construção; class deixa você controlar tudo, mas é onde metade dos bugs de equals moram.",
+          "createdAt": "2026-09-29T01:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Bom. E `record` também **congela a API** — você não herda. Do campo para a imutabilidade: o que é *deep immutability* e onde o `record` falha?",
+          "createdAt": "2026-09-29T09:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Deep immutability é quando os campos e o que eles apontam não mudam. O record falha quando o atributo é coleção mutável ou objeto com setter.",
+          "createdAt": "2026-09-29T17:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Certo. `List.of` já resolve a coleção. Passo 2 — **Streams**: me dê uma forma comum de `reduce` e um erro típico com `flatMap`.",
+          "createdAt": "2026-09-30T01:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "reduce pra somar; erro típico do flatMap é aninhar e retornar Optional dentro de Optional em vez de achatar.",
+          "createdAt": "2026-09-30T09:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Achatar `Optional` é a pegadinha que pega todo mundo. Corrija: quando `fn` devolve `Optional` variável, como evitar o `Optional<Optional>`?",
+          "createdAt": "2026-09-30T17:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Uso `flatMap(Optional::stream)` no Java 9+, ou `flatMap(o -> o.stream())` antes disso. Evita o Optional<Optional>.",
+          "createdAt": "2026-10-01T01:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Exato. Passo 3 — **virtual threads**: para que cenário elas realmente servem e onde não ajudam?",
+          "createdAt": "2026-10-01T09:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Servem pra I/O bloqueante e muitas conexões; não servem para CPU-bound nem para processamento paralelo puro.",
+          "createdAt": "2026-10-01T17:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Quase — \"CPU-bound\" merece precisão: virtual thread não acelera cálculo (o limite é núcleos), ela barateia o **custo de contexto**. Passo 4 — **pattern matching**: que problema o `switch` sobre tipos resolve e o que `sealed` muda nisso?",
+          "createdAt": "2026-10-02T01:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Elimina o encadeamento de if/instanceof. Com sealed, o compilador sabe os subtipos e o switch vira exaustivo, sem default.",
+          "createdAt": "2026-10-02T09:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "A *exaustividade* é o maior argumento para `sealed`. Passo 5 — **text blocks**: o que são e o erro comum de indentação.",
+          "createdAt": "2026-10-02T17:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Text blocks são strings multilinha com \"\"\"...\"\"\". O erro comum: o fechamento define a indentação — delimitador final recuado diferente recua o texto inteiro.",
+          "createdAt": "2026-10-03T01:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "É isso: a indentação é controlada pelo **fechamento**. Passo 6 — **collectors**: `groupingBy` com `mapping`; e quando `toMap` pede merge function.",
+          "createdAt": "2026-10-03T09:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "groupingBy agrupa por chave e mapping transforma o valor; toMap lança IllegalStateException se chave duplicar sem merge.",
+          "createdAt": "2026-10-03T17:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Certo, e essa exceção é didática — aparece justamente nos buracos de cardinalidade. Passo 7 — **interfaces**: onde `default` pode encobrir erro?",
+          "createdAt": "2026-10-04T01:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Default é compatibilidade de API; esconde erro quando põe lógica default que o implementador deveria fornecer e ninguém sobrescreve.",
+          "createdAt": "2026-10-04T09:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Exato: `default` bom é \"no-op seguro\"; `default` ruim é regra de negócio invisível. Passo 8 — **try-with-resources** com recurso `null`: comporta?",
+          "createdAt": "2026-10-04T17:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Aceita null silenciosamente, o recurso é apenas ignorado no fechamento.",
+          "createdAt": "2026-10-05T01:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Null no try-with-resources não lança. Passo 9 — **var**: quando `var` atrapalha em vez de ajudar?",
+          "createdAt": "2026-10-05T09:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Atrapalha quando esconde o tipo da API pública; ajuda em declaração local redundante como `Map<String, List<X>> m = new HashMap<>()`. Em geral, se nome e tipo são óbvios, var ajuda.",
+          "createdAt": "2026-10-05T17:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "A regra do bom `var`: deixe que ele **encoste** no tipo quando já é óbvio. Passo 10 — **Files.lines**: por que o Stream precisa de try-with-resources?",
+          "createdAt": "2026-10-06T01:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Porque o Stream abre o arquivo e precisa ser fechado; se não fechar, vaza file descriptor.",
+          "createdAt": "2026-10-06T09:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Perfeito — `Files.lines` *não* se auto-fecha no terminal operation. Passo 11 — **records e JSON**: o que você espera do Jackson ao desserializar um record?",
+          "createdAt": "2026-10-06T17:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Jackson usa o construtor canônico; espero que uma violação de invariante no construtor lance no parse.",
+          "createdAt": "2026-10-07T01:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Sim, e essa é a graça: o construtor canônico é a validação única. Falhou, o `ObjectMapper` lança antes do objeto existir. Passo 12 — **JPMS**: o módulo resolve o que e o que ele não resolve?",
+          "createdAt": "2026-10-07T09:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Resolve encapsulamento e dependências explícitas; não resolve versão — isso continua no resolver de build (Maven/Gradle).",
+          "createdAt": "2026-10-07T17:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Certo: JPMS é *encapsulamento*, não gerenciamento de versão. Passo 13 — **GC**: que flag entrega heap dump no OOM e por que ajuda?",
+          "createdAt": "2026-10-08T01:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "`-XX:+HeapDumpOnOutOfMemoryError` e `-XX:HeapDumpPath`. Ajuda porque o dump captura o heap exatamente no estouro.",
+          "createdAt": "2026-10-08T09:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Exato — o dump de OOM pega o estado do estouro, que um dump manual pós-fato não reproduz. Passo 14 — **concorrência**: `AtomicInteger` vs `volatile`. Onde um não substitui o outro?",
+          "createdAt": "2026-10-08T17:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Atomic tem operações read-modify-write atômicas; volatile só garante visibilidade, não atomicidade do composto.",
+          "createdAt": "2026-10-09T01:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Perfeito. Passo 15 — **testes com clock**: qual a ferramenta e o risco de usar `Thread.sleep` no teste?",
+          "createdAt": "2026-10-09T09:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Clock mockado, tipo `Clock` do Java + `Inject`. Sleep deixa o teste lento, flaky e esconde o tempo real.",
+          "createdAt": "2026-10-09T17:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "É isso. Passo 16 — **HttpClient**: um caso para `BodyHandlers.ofString` e um onde você precisa de streaming.",
+          "createdAt": "2026-10-10T01:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "ofString pra resposta pequena que vira JSON; streaming para download grande, pra não segurar o corpo inteiro em memória.",
+          "createdAt": "2026-10-10T09:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Certo. Passo 17 — **sealed + records**: modelando um resultado de operação. Quais os dois subtipos mais comuns e o que o switch ganha?",
+          "createdAt": "2026-10-10T17:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Sucesso e erro. O switch ganha exaustividade: sem branch novo o compilador avisa.",
+          "createdAt": "2026-10-11T01:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Boas! Passo 18 — **performance**: `StringBuilder` dentro de loop com `+`. Vale micro-otimizar?",
+          "createdAt": "2026-10-11T09:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "O compilador já concatena com StringBuilder; micro-otimizar vale só se o perfil mostrar.",
+          "createdAt": "2026-10-11T17:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Regra de ouro: perfil antes da micro-otimização. Passo 19 — **threads**: `ExecutorService` vs virtual threads. Prefere qual?",
+          "createdAt": "2026-10-12T01:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Para I/O e muitas conexões, virtual threads; para CPU-bound raso, executor comum. Na dúvida, meça o custo.",
+          "createdAt": "2026-10-12T09:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Na dúvida meça — a pior resposta é copiar exemplo de blog sem medir. Passo 20 — **exceção em stream**: por que ela polui o código?",
+          "createdAt": "2026-10-12T17:00:00Z"
+        },
+        {
+          "role": "user",
+          "content": "Porque o Stream não tem tratamento estrutural — você põe try/catch dentro do lambda e o fluxo inteiro fica cheio de corpo.",
+          "createdAt": "2026-10-13T01:00:00Z"
+        },
+        {
+          "role": "assistant",
+          "content": "Finalizamos. Você acertou o raciocínio dos 20 — o único escorregão foi \"CPU-bound\" numa virtual thread: virtual thread não é pra cálculo puro. Nota: **9,5/10**.",
+          "createdAt": "2026-10-13T09:00:00Z"
         }
       ]
     }

@@ -10,7 +10,7 @@ O fluxo é: importar → sincronizar → ler no Kindle → favoritar/bookmark �
 ## Estado
 
 🚧 **Etapas 1–6 concluídas, incluindo o passo em dispositivo.** A verificação das APIs
-reais (R5) está feita e `kindle/` está escrito, com **137 specs** verdes no container:
+reais (R5) está feita e `kindle/` está escrito, com **146 specs** verdes no container:
 store SQLite com migração, sync transacional, escritas offline com outbox, lógica pura
 de biblioteca/leitor, adapter HTTP e settings, e as telas **executando de verdade**
 sob stubs do KOReader (`spec/ui_spec.lua`), com os campos de cada widget conferidos
@@ -124,7 +124,7 @@ docker compose up -d --build
 Importe os arquivos de exemplo e valide o fluxo:
 
 ```bash
-# 6 conversas (JSON genérico)
+# 10 conversas (JSON genérico)
 ./scripts/import.sh sample-data/chats.json
 
 # 2 conversas (Markdown) e o export do ChatGPT, se você tiver o seu
@@ -135,7 +135,7 @@ Importe os arquivos de exemplo e valide o fluxo:
 CHAT_READER_USERNAME=reader CHAT_READER_PASSWORD='sua-senha' ./scripts/smoke.sh
 ```
 
-Importar o mesmo arquivo de novo devolve `created: 0` e `skipped: 6` — a importação
+Importar o mesmo arquivo de novo devolve `created: 0` e `skipped: 10` — a importação
 é idempotente. Veja [sample-data/README.md](sample-data/README.md).
 
 Organize e busque (com token em `$TOKEN`):

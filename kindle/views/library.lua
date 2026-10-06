@@ -12,6 +12,8 @@ local UIManager = require("ui/uimanager")
 
 local library = require("client.library")
 
+local settings_ui = require("views.settings")
+
 local M = {}
 
 local APP = "Chat Reader"
@@ -35,7 +37,31 @@ function M.show_chats(ctx, opts)
         return
     end
 
-    local buttons = {}
+    local buttons = { {
+            {
+                text = "Sincronizar",
+                callback = function()
+                    UIManager:close(dialog)
+                    -- sincronizou: a lista recria do banco ao voltar
+                    ctx.reopen_after_sync = true
+                    ctx:sync_now()
+                end,
+            },
+            {
+                text = "Buscar",
+                callback = function()
+                    UIManager:close(dialog)
+                    M.show_search(ctx)
+                end,
+            },
+            {
+                text = "Configurações",
+                callback = function()
+                    UIManager:close(dialog)
+                    settings_ui.show(ctx)
+                end,
+            },
+        } }
     local dialog
     local function open_chat(id)
         -- O botao do ButtonDialog nao fecha a caixa sozinho (as chamadas do KOReader

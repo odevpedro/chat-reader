@@ -115,6 +115,17 @@ describe("a biblioteca abre", function()
         assert.is_table(dialog.buttons)
         assert.is_true(#dialog.buttons >= 1)
         assert.is_string(dialog.title)
+        -- acoes no topo: Sincronizar, Buscar, Configurações
+        assert.is_table(dialog.buttons[1], "primeira linha não é a de ações")
+        assert.is_truthy(tostring(dialog.buttons[1][1].text):find("Sincronizar", 1, true),
+            "falta o botão Sincronizar na biblioteca preenchida")
+        assert.is_truthy(tostring(dialog.buttons[1][2].text):find("Buscar", 1, true),
+            "falta o botão Buscar na biblioteca preenchida")
+        assert.is_truthy(tostring(dialog.buttons[1][3].text):find("Configura", 1, true),
+            "falta Configurações na biblioteca preenchida")
+        -- sincronizar fecha a lista e dispara o sync (que pede a senha sem token)
+        local ok, err = pcall(function() dialog.buttons[1][1].callback() end)
+        assert.is_true(ok, "botão Sincronizar quebrou: " .. tostring(err))
     end)
 
     it("a busca abre um InputDialog com botoes e title", function()
@@ -172,8 +183,11 @@ describe("a tela de leitura funciona", function()
         local viewer = reader:build()
         assert.equals(stub.TextViewer, viewer._class)
         assert.is_string(viewer.title)
-        assert.equals("md", viewer.text_format)
+        -- texto ja vem convertido: quem fala + corpo em texto plano (o TextViewer
+        -- nao renderiza markdown, entao nao ha text_format).
+        assert.is_nil(viewer.text_format)
         assert.is_truthy(tostring(viewer.text):find("Ola", 1, true))
+        assert.is_truthy(tostring(viewer.text):find("Você", 1, true))
     end)
 
     it("Favoritar e Bookmark sao botoes de verdade, e nao quebram", function()
@@ -181,9 +195,10 @@ describe("a tela de leitura funciona", function()
         local viewer = reader:build()
         assert.is_true(viewer.add_default_buttons,
             "sem add_default_buttons, o buttons_table engole Find e Close")
-        local row = assert(viewer.buttons_table[1], "botoes nao montados")
         local by_id = {}
-        for _, b in ipairs(row) do by_id[b.id] = b end
+        for _, row in ipairs(viewer.buttons_table) do
+            for _, b in ipairs(row) do by_id[b.id] = b end
+        end
         assert.is_not_nil(by_id.favorite, "botao favoritar ausente")
         assert.is_not_nil(by_id.bookmark, "botao bookmark ausente")
 
@@ -192,6 +207,23 @@ describe("a tela de leitura funciona", function()
 
         by_id.favorite.callback()
         assert.is_false(reader:is_favorite(), "favoritar de novo nao desmarca")
+    end)
+
+    it("Próxima e Anterior sao botoes visiveis para navegar", function()
+        local plugin, reader = reader_with_one_message()
+        local viewer = reader:build()
+        local by_id = {}
+        for _, row in ipairs(viewer.buttons_table) do
+            for _, b in ipairs(row) do by_id[b.id] = b end
+        end
+        assert.is_not_nil(by_id.prev, "sem botao Anterior")
+        assert.is_not_nil(by_id.next, "sem botao Próxima")
+        assert.is_truthy(tostring(by_id.next.text):find("Próxima", 1, true))
+        -- no fim da conversa, Próxima nao faz nada de mais
+        local before = #stub.shown
+        by_id.next.callback()
+        by_id.prev.callback()
+        assert.equals(before, #stub.shown, "navegar na conversa de uma mensagem abriu tela")
     end)
 
     it("o guarda de tela fechada impede fechar duas vezes", function()
@@ -217,6 +249,36 @@ describe("a tela de leitura funciona", function()
         local before = #stub.shown
         viewer.page_turn_callback_prev()
         assert.is_true(#stub.shown >= before)
+    end)
+
+    it("pergunta e resposta aparecem identificadas, e a pergunta diz aonde esta a resposta", function()
+        local plugin = new_plugin()
+        local store = plugin:get_store()
+        store:put_chat({
+            id = "c1", title = "oi, bom dia", role = "user",
+            created_at = 1, updated_at = 2, content_hash = "x",
+            messages = {
+                { id = "m1", seq = 1, role = "USER", content = "oi, bom dia!",
+                  created_at = 1, content_hash = "h1" },
+                { id = "m2", seq = 2, role = "ASSISTANT", content = "oi! tudo bem?",
+                  created_at = 2, content_hash = "h2" },
+            },
+        })
+        local reader = require("views.reader").new(store, "c1", nil, nil)
+        local viewer = reader:build()
+        assert.is_truthy(tostring(viewer.text):find("Você", 1, true), "pergunta sem papel identificado")
+        assert.is_truthy(tostring(viewer.text):find("próxima página", 1, true), "pergunta sem aviso da resposta")
+        assert.is_false(tostring(viewer.text):find("tudo bem", 1, true) ~= nil, "resposta apareceu antes da hora")
+
+        local by_id = {}
+        for _, row in ipairs(viewer.buttons_table) do
+            for _, b in ipairs(row) do by_id[b.id] = b end
+        end
+        by_id.next.callback()
+        local viewer2 = reader:build()
+        assert.is_truthy(tostring(viewer2.text):find("Assistente", 1, true), "resposta sem papel identificado")
+        assert.is_truthy(tostring(viewer2.text):find("tudo bem", 1, true), "resposta sumiu")
+        assert.is_truthy(tostring(viewer2.title):find("Assistente", 1, true), "titulo sem quem fala")
     end)
 end)
 

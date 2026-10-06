@@ -5,9 +5,11 @@
 -- pior de rolar. Uma mensagem por vez, com virada de pagina, e o que o leitor do
 -- proprio KOReader faz com paginas.
 --
--- O texto vai como markdown: o TextViewer tem `text_format = "md"` e usa o mesmo
--- mdToHtml + crengine que o KOReader usa para abrir .md. Por isso nao ha renderer
--- aqui — uma reimplementacao seria pior e nao testavel fora do dispositivo.
+-- O texto vai como **texto plano ja convertido**: o TextViewer do KOReader nao tem
+-- `text_format = "md"` no v2026.03 (verificado no fonte), entao markdown mostrado cru
+-- ficaria com `*`, `#` e cercas na tela. Quem converte e `client.format`
+-- (markdown -> texto plano, com cabecalho de quem fala), e nao ha renderer aqui:
+-- uma reimplementacao em HTML nao apareceria no TextViewer de qualquer jeito.
 
 -- Os modulos do KOReader sao carregados dentro de build()/show(), nao no topo, de
 -- proposito: a navegacao (goto, janela, onde parou) e logica pura que os specs do
@@ -95,7 +97,15 @@ function Reader:is_bookmarked()
 end
 
 function Reader:title()
-    return string.format("%d/%d · %s", self.index, self.total, self.chat.title or "")
+    -- A barra de titulo mostra de quem e a mensagem atual: e a distincao visual
+    -- mais clara no e-ink (o corpo tem o cabecalho em texto, e o titulo tambem).
+    local format = require("client.format")
+    local who = format.role_label(self:current())
+    local name = self.chat.title or ""
+    if who ~= "" and name ~= "" then
+        return string.format("%d/%d · %s · %s", self.index, self.total, who, name)
+    end
+    return string.format("%d/%d · %s%s", self.index, self.total, who, name)
 end
 
 -- ---------------------------------------------------------------------------
@@ -163,12 +173,29 @@ end
 function Reader:build()
     local UIManager = require("ui/uimanager")
     local TextViewer = require("ui/widget/textviewer")
+    local format = require("client.format")
     local message = self:current()
+    local next_message = self.messages[self.index + 1]
     return TextViewer:new{
         title = self:title(),
-        text = message and message.content or "",
-        text_format = "md",
+        text = message and format.display_text(message, next_message) or "",
         buttons_table = {
+            {
+                {
+                    text = "‹ Anterior",
+                    id = "prev",
+                    callback = function()
+                        if self:prev() then self:refresh() end
+                    end,
+                },
+                {
+                    text = "Próxima ›",
+                    id = "next",
+                    callback = function()
+                        if self:next() then self:refresh() end
+                    end,
+                },
+            },
             {
                 {
                     text = self:is_favorite() and "Favorito ✓" or "Favoritar",

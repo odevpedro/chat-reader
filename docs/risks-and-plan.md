@@ -38,7 +38,7 @@
 | **6. Offline** ✅ | Teste com o backend **desligado** | Conversas, bookmarks, navegação e busca funcionam sem rede | R9 |
 
 > **Etapas 5 e 6 encerradas.** R5 foi fechado conferindo o código do KOReader
-> (`koreader/koreader@b539d24`); `kindle/` está escrito e coberto por **137 specs**
+> (`koreader/koreader@b539d24`); `kindle/` está escrito e coberto por **146 specs**
 > em `./kindle/spec.sh` — store SQLite, sync transacional, outbox, lógica pura de
 > biblioteca/leitor, adapters HTTP/settings, sintaxe de todos os arquivos e a UI
 > (`main.lua`, biblioteca, leitor, configuração). O leitor usa o `TextViewer` do
