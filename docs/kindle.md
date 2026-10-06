@@ -3,7 +3,7 @@
 > **Status: Etapas 1–6 concluídas, incluindo o passo em dispositivo** (2026-10-06):
 > O plugin roda no Kindle (KOReader v2026.03) — sync de ponta a ponta validado com o
 > backend real. O desenho foi conferido contra o código do KOReader (verificação R5,
-> commit `b539d24` de 2026-09-29) e `kindle/` está escrito e testado com **146 specs**
+> commit `b539d24` de 2026-09-29) e `kindle/` está escrito e testado com **151 specs**
 > verdes no container (mesmo LuaJIT + ljsqlite3 do dispositivo): store SQLite com
 > migração, lógica de sync transacional, outbox, lógica de biblioteca e leitor (puras,
 > spec'd), navegação do leitor e adapters HTTP/settings. A UI (`main.lua`, biblioteca,
@@ -173,7 +173,7 @@ contra o código do KOReader e do binding, não de memória):
   seria executado de novo no arquivo seguinte e quebraria no segundo `ffi.cdef`; por
   isso o script roda **um busted por arquivo**, que é a forma honesta de isolar.
 
-Estado atual: **146 specs** cobrindo store SQLite (schema, migração, CRUD, tags,
+Estado atual: **151 specs** cobrindo store SQLite (schema, migração, CRUD, tags,
 bookmarks, transações), escrita offline e outbox, `client/sync.lua` (delta, paginação,
 snapshot, ack, token que não avança quando a gravação falha), a lógica pura de
 biblioteca e leitor (`client/library.lua`, `client/positions.lua`, navegação de

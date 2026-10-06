@@ -10,7 +10,7 @@ O fluxo é: importar → sincronizar → ler no Kindle → favoritar/bookmark �
 ## Estado
 
 🚧 **Etapas 1–6 concluídas, incluindo o passo em dispositivo.** A verificação das APIs
-reais (R5) está feita e `kindle/` está escrito, com **146 specs** verdes no container:
+reais (R5) está feita e `kindle/` está escrito, com **151 specs** verdes no container:
 store SQLite com migração, sync transacional, escritas offline com outbox, lógica pura
 de biblioteca/leitor, adapter HTTP e settings, e as telas **executando de verdade**
 sob stubs do KOReader (`spec/ui_spec.lua`), com os campos de cada widget conferidos

@@ -209,16 +209,17 @@ describe("a tela de leitura funciona", function()
         assert.is_false(reader:is_favorite(), "favoritar de novo nao desmarca")
     end)
 
-    it("Próxima e Anterior sao botoes visiveis para navegar", function()
+    it("Próxima e Anterior sao setas visiveis para navegar", function()
         local plugin, reader = reader_with_one_message()
         local viewer = reader:build()
         local by_id = {}
         for _, row in ipairs(viewer.buttons_table) do
             for _, b in ipairs(row) do by_id[b.id] = b end
         end
-        assert.is_not_nil(by_id.prev, "sem botao Anterior")
-        assert.is_not_nil(by_id.next, "sem botao Próxima")
-        assert.is_truthy(tostring(by_id.next.text):find("Próxima", 1, true))
+        assert.is_not_nil(by_id.prev, "sem seta Anterior")
+        assert.is_not_nil(by_id.next, "sem seta Próxima")
+        assert.is_truthy(tostring(by_id.next.text):find("↘", 1, true), "Próxima nao virou seta baixa")
+        assert.is_truthy(tostring(by_id.prev.text):find("↗", 1, true), "Anterior nao virou seta alta")
         -- no fim da conversa, Próxima nao faz nada de mais
         local before = #stub.shown
         by_id.next.callback()

@@ -182,14 +182,14 @@ function Reader:build()
         buttons_table = {
             {
                 {
-                    text = "‹ Anterior",
+                    text = "↗",
                     id = "prev",
                     callback = function()
                         if self:prev() then self:refresh() end
                     end,
                 },
                 {
-                    text = "Próxima ›",
+                    text = "↘",
                     id = "next",
                     callback = function()
                         if self:next() then self:refresh() end
