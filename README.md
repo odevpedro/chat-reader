@@ -131,6 +131,12 @@ Importe os arquivos de exemplo e valide o fluxo:
 ./scripts/import.sh sample-data/chats.md
 ./scripts/import.sh ~/Downloads/conversations.json
 
+# export do ChatGPT em .zip (descompacta, junta as partes e importa)
+./scripts/import-export.sh ~/Downloads/chatgpt-export-2026-10-06.zip
+
+# ou fica vigiando a pasta: quando um export novo cair, importa sozinho
+./scripts/import-export.sh --watch ~/Downloads
+
 # ou rode o smoke test ponta a ponta (health → login → import → listagem)
 CHAT_READER_USERNAME=reader CHAT_READER_PASSWORD='sua-senha' ./scripts/smoke.sh
 ```
