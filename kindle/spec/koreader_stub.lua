@@ -129,6 +129,9 @@ local InputDialog = widget_module("ui/widget/inputdialog", {
     title = nil, input = nil, input_hint = nil, ok_text = nil,
     callback = nil, ok_callback = nil,
 })
+-- Fiel ao upstream (frontend/ui/widget/inputdialog.lua): o texto fica no widget
+-- interno -> getInputText(); `input` e so o valor inicial, nao tem getText().
+function InputDialog:getInputText() return self.input or "" end
 M.InputDialog = InputDialog
 
 -- DataStorage: no aparelho, /mnt/sd/koreader/settings e /mnt/sd/koreader/data.

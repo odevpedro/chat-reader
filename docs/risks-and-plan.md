@@ -38,11 +38,15 @@
 | **6. Offline** ✅ | Teste com o backend **desligado** | Conversas, bookmarks, navegação e busca funcionam sem rede | R9 |
 
 > **Etapas 5 e 6 encerradas.** R5 foi fechado conferindo o código do KOReader
-> (`koreader/koreader@b539d24`); `kindle/` está escrito e coberto por **117 specs**
+> (`koreader/koreader@b539d24`); `kindle/` está escrito e coberto por **137 specs**
 > em `./kindle/spec.sh` — store SQLite, sync transacional, outbox, lógica pura de
 > biblioteca/leitor, adapters HTTP/settings, sintaxe de todos os arquivos e a UI
 > (`main.lua`, biblioteca, leitor, configuração). O leitor usa o `TextViewer` do
-> KOReader com markdown (mdToHtml + crengine); não há renderer próprio.
+> KOReader com markdown (mdToHtml + crengine); não há renderer próprio. O passo em
+> **dispositivo** também passou (KOReader v2026.03 no Kindle): o primeiro sync morria
+> porque `DUSE_TURBO_LIB = false` → sem `UIManager.looper` o `httpclient` quebra;
+> `client/http.lua` foi movido para `socket.http` + `socketutil` (síncrono) e o sync
+> de ponta a ponta rodou no aparelho (detalhes em `docs/kindle.md`).
 >
 > As duas etapas que dependiam do backend real também fecharam:
 >

@@ -73,6 +73,13 @@ describe("o plugin carrega como o KOReader carrega", function()
         assert.is_function(items.chatreader.callback)
     end)
 
+    it("a entrada declara sorting_hint, senao o MenuSorter joga fora do menu de Ferramentas", function()
+        local plugin = new_plugin()
+        local items = {}
+        plugin:addToMainMenu(items)
+        assert.equals("more_tools", items.chatreader.sorting_hint)
+    end)
+
     it("o caminho do banco sai de DataStorage", function()
         local plugin = new_plugin()
         assert.is_string(plugin:db_path())
@@ -119,6 +126,27 @@ describe("a biblioteca abre", function()
         -- O InputDialog real usa buttons_table, nao callback:
         assert.is_table(dialog.buttons, "InputDialog sem botoes")
         assert.is_true(#dialog.buttons >= 1, "InputDialog sem botoes")
+    end)
+
+    it("Salvar na busca usa getInputText (API real do InputDialog), sem crash", function()
+        local plugin = new_plugin()
+        plugin:get_store():put_chat({
+            id = "c1", title = "Conversa sobre Java", role = "user",
+            created_at = 1, updated_at = 2, content_hash = "x",
+            messages = { {
+                id = "m1", seq = 1, role = "user", content = "java é legal",
+                created_at = 1, content_hash = "h1",
+            } },
+        })
+        require("views.library").show_search(plugin)
+        local dialog = shown_of(stub.InputDialog)
+        assert.is_function(dialog.getInputText, "InputDialog sem getInputText (era input:getText, que estoura no v2026.03)")
+        dialog.input = "  java   "
+        local ok, err = pcall(function() dialog.buttons[1][2].callback() end)
+        assert.is_true(ok, "callback de salvar quebrou: " .. tostring(err))
+        local results = stub.last_shown(function(w) return w._class == stub.ButtonDialog end)
+        assert.is_not_nil(results, "nada apareceu depois de salvar a busca")
+        assert.is_truthy(tostring(results.buttons[1][1].text):find("Java", 1, true))
     end)
 end)
 
@@ -202,6 +230,21 @@ describe("o menu de configuracoes abre", function()
         assert.is_not_nil(menu, "nenhum Menu apareceu")
         assert.is_table(menu.item_table)
         assert.is_true(#menu.item_table > 0, "menu sem itens")
+    end)
+
+    it("Salvar na configuracao devolve o texto pelo getInputText, sem crash", function()
+        local plugin = new_plugin()
+        local got
+        require("views.settings").ask("Titulo", "valor-atual", "dica",
+            function(v) got = v end)
+        local dialog = shown_of(stub.InputDialog)
+        assert.is_function(dialog.getInputText,
+            "InputDialog sem getInputText (era input:getText, que estoura no v2026.03)")
+        dialog.input = "http://192.168.0.10:8080"
+        local ok, err = pcall(function() dialog.buttons[1][2].callback() end)
+        assert.is_true(ok, "callback de salvar quebrou: " .. tostring(err))
+        assert.equals("http://192.168.0.10:8080", got,
+            "o texto digitado nao chegou ao on_save")
     end)
 
     it("o diagnostico mostra versoes, banco, config e fila", function()

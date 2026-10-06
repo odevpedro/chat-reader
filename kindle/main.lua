@@ -57,8 +57,14 @@ function ChatReader:init()
 end
 
 function ChatReader:addToMainMenu(menu_items)
+    -- sorting_hint e obrigatorio: o MenuSorter so posiciona item de plugin que
+    -- esta no filemanager_menu_order.lua ou que declara a dica; sem ela o item
+    -- vira orfao com prefixo "NEW: " na primeira aba do menu, fora de
+    -- Ferramentas (e e la que o usuario procura). "more_tools" e o mesmo destino
+    -- de terminal e kindlelichess neste build (frontend/ui/elements/filemanager_menu_order.lua).
     menu_items.chatreader = {
         text = "Chat Reader",
+        sorting_hint = "more_tools",
         callback = function()
             self:onShowChatReader()
         end,

@@ -44,6 +44,12 @@ kindle/settings.lua
 *.key
 koreader-settings.lua
 
+# Dados locais (IP, MAC, senha do aparelho) — cada quem tem o seu
+docs/*.local.md
+
+# Pacote gerado por kindle/scripts/package.sh
+/chatreader.koplugin
+
 # Banco local do Kindle
 *.sqlite
 *.sqlite-journal

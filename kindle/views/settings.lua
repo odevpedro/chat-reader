@@ -48,7 +48,7 @@ function M.ask(title, current, hint, on_save)
                     is_enter_default = true,
                     callback = function()
                         UIManager:close(dialog)
-                        on_save((dialog.input and dialog.input:getText()) or "")
+                        on_save(dialog:getInputText() or "")
                     end,
                 },
             },

@@ -9,12 +9,19 @@ O fluxo é: importar → sincronizar → ler no Kindle → favoritar/bookmark �
 
 ## Estado
 
-🚧 **Etapas 5 e 6 concluídas; falta o passo em dispositivo.** A verificação das APIs
-reais (R5) está feita e `kindle/` está escrito, com **131 specs** verdes no container:
+🚧 **Etapas 1–6 concluídas, incluindo o passo em dispositivo.** A verificação das APIs
+reais (R5) está feita e `kindle/` está escrito, com **137 specs** verdes no container:
 store SQLite com migração, sync transacional, escritas offline com outbox, lógica pura
-de biblioteca/leitor, adapter HTTP e settings, e — desde o último commit — as telas
-**executando de verdade** sob stubs do KOReader (`spec/ui_spec.lua`), com os campos de
-cada widget conferidos contra a fonte do upstream.
+de biblioteca/leitor, adapter HTTP e settings, e as telas **executando de verdade**
+sob stubs do KOReader (`spec/ui_spec.lua`), com os campos de cada widget conferidos
+contra a fonte do upstream.
+
+O plugin também **roda no Kindle** (KOReader v2026.03): o primeiro sync em aparelho
+expôs que neste Kindle `DUSE_TURBO_LIB = false` — sem `UIManager.looper` o
+`httpclient` do KOReader quebra, então o adapter HTTP foi movido para o caminho
+síncrono (`socket.http` + `socketutil`, timeout de bloco/total) e o sync de ponta a
+ponta passou. Instalação e SSH no aparelho: **[docs/instalar-no-kindle.md](docs/instalar-no-kindle.md)**
+e **[docs/conectar-ssh.md](docs/conectar-ssh.md)**.
 
 Dois testes rodam contra o backend **real**, não contra stub:
 
@@ -22,12 +29,13 @@ Dois testes rodam contra o backend **real**, não contra stub:
 - `./kindle/scripts/offline.sh` → `offline ok` (backend derrubado, biblioteca e
   escritas continuam funcionando, fila drena quando ele volta).
 
-Para instalar no aparelho: **[docs/instalar-no-kindle.md](docs/instalar-no-kindle.md)**.
-`./kindle/scripts/package.sh` monta o `.koplugin` e verifica que ele carrega fora do
-repo — um `require` quebrado passa nos specs e só viraria tela branca no Kindle.
+`./kindle/scripts/package.sh` monta o plugin instalável (pasta `chatreader.koplugin`)
+e verifica que ele carrega fora do repo — um `require` quebrado passa nos specs e só
+viria tela branca no Kindle; **não copie se aparecer `FALTA`/`ERRO`**.
 
-O único item aberto é o plugin rodar no KOReader de verdade (emulador/dispositivo),
-que nenhum teste em container substitui: e-ink, gestos de página, teclado.
+O que falta é o refinamento (Etapa 7): e-ink, gestos e teclado já rodam no aparelho,
+mas a UX de leitura (markdown, contraste, paginação grande) ainda precisa de ajuste
+fino em uso real.
 
 | Etapa | Status | Documento |
 |-------|--------|-----------|
@@ -60,6 +68,7 @@ trazendo as escritas feitas offline (favoritos e bookmarks).
 | [docs/sync-protocol.md](docs/sync-protocol.md) | Protocolo de delta sync, conflitos, resiliência |
 | [docs/kindle.md](docs/kindle.md) | Cliente KOReader: desenho, SQLite, performance, testes |
 | [docs/instalar-no-kindle.md](docs/instalar-no-kindle.md) | Passo a passo para instalar no aparelho e diagnosticar |
+| [docs/conectar-ssh.md](docs/conectar-ssh.md) | SSH no Kindle: ligar o servidor, descobrir o IP, comandos úteis |
 | [docs/risks-and-plan.md](docs/risks-and-plan.md) | Riscos, plano por etapa, verificação de APIs |
 | [docs/system-feature-flows.md](docs/system-feature-flows.md) | Fluxo de cada feature: entrada, camadas, erros, decisões |
 | [docs/data-model.md](docs/data-model.md) | Modelo persistido: entidades, atributos, índices, consistência, privacidade |

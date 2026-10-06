@@ -33,13 +33,15 @@ cp -R "$root/kindle/views"        "$plugin/"
 # schema para embutir aqui. O que o store precisa e do ljsqlite3, que ja vem na
 # propria imagem do KOReader.
 
-rm -f "$out"
+# A ordem importa: `rm -f` em diretorio falha e, com `set -eu`, matava o script antes
+# do ramo de diretorio — quem pre-criava a pasta de saida nunca chegava nele.
 if [ -d "$out" ]; then
     # saida e um diretorio: e um pacote extraido, util para conferir o conteudo.
     rm -rf "$out"
     cp -R "$plugin" "$out"
     echo "pasta pronta em $out"
 else
+    rm -f "$out"
     (cd "$staging" && zip -q -r "$out" chatreader.koplugin)
     echo "pacote pronto em $out"
 fi

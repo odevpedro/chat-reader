@@ -98,7 +98,7 @@ Se o health check não responder, o problema está aqui — ainda não é do Kin
 Pelo menos uma, para o plugin ter o que mostrar:
 
 ```sh
-CHAT_READER_USERNAME=odevpedro CHAT_READER_PASSWORD='a-senha-do-passo-4' \
+CHAT_READER_USERNAME=reader CHAT_READER_PASSWORD='a-senha-do-passo-4' \
   ./scripts/import.sh sample-data/chats.json
 ```
 
@@ -120,11 +120,18 @@ dela no passo 9 e não tem como recuperá-la do hash.
 
 ## 6. Gerar o pacote
 
+O pluginloader só lê **diretórios** terminados em `.koplugin` (`pluginloader.lua`
+filtra `mode == "directory"`); um `.zip` com esse nome é silenciosamente ignorado.
+Então o pacote de instalação é uma pasta:
+
 ```sh
-./kindle/scripts/package.sh
+mkdir -p chatreader.koplugin
+./kindle/scripts/package.sh chatreader.koplugin
 ```
 
-Isso cria `chatreader.koplugin` na raiz do repo e, no fim, imprime a verificação:
+Isso cria `chatreader.koplugin/` na raiz do repo. O `./kindle/scripts/package.sh`
+sem argumento gera um `.zip` com esse nome — útil só para conferir/conteúdo, **não**
+para instalar. No fim o script imprime a verificação:
 
 ```
 conferindo os requires do main.lua contra o conteudo do pacote:
@@ -139,17 +146,15 @@ carregar. O problema está na lista.
 
 ## 7. Copiar para o Kindle
 
-**Sem SSH, pelo navegador do Kindle:**
-
-1. `http://<ip-do-kindle>:8080/` no navegador do Kindle;
-2. entre em *Arquivos* → `koreader` → `plugins`;
-3. *Enviar arquivo* → escolha o `chatreader.koplugin`.
-
-**Com SSH** (mais confiável para arquivo grande):
+**Via SSH** (a pasta inteira, preservando o modo diretório):
 
 ```sh
-scp chatreader.koplugin root@<ip-do-kindle>:/mnt/sd/koreader/plugins/
+scp -P 2222 -r chatreader.koplugin root@<ip-do-kindle>:/mnt/us/koreader/plugins/
 ```
+
+O servidor SSH está embutido no KOReader (veja [docs/conectar-ssh.md](conectar-ssh.md)):
+ligue em **Configurações → Rede → Servidor SSH**. Sem ele, copie o `.zip` para o
+aparelho e descompacte lá em `koreader/plugins/chatreader.koplugin/`.
 
 O nome tem que terminar em `.koplugin`. Sem o sufixo, o pluginloader ignora a pasta e
 o menu simplesmente não muda — é a causa número um de "instalei e nada aconteceu".
@@ -179,13 +184,13 @@ Abra **Configurações → Diagnóstico**. A tela responde seis perguntas de uma
 
 ```
 Chat Reader 0.1.0 · contrato 1
-KOReader 2024.2
+KOReader v2026.03
 
-Banco: /mnt/sd/koreader/data/chatreader.sqlite3
+Banco: /mnt/us/koreader/data/chatreader.sqlite3
   conversas: 6 · mensagens: 32 · tags: 3 · bookmarks: 2
 
-Servidor: http://192.168.1.73:8080
-  usuário: odevpedro
+Servidor: http://<ip-do-seu-computador>:8080
+  usuário: reader
   token: 57 min
 
 Fila de escritas: 0 pendente(s)

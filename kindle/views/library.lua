@@ -75,7 +75,7 @@ function M.show_search(ctx)
     local dialog
     local function search()
         UIManager:close(dialog)
-        local term = ((dialog.input and dialog.input:getText()) or ""):gsub("^%s+", "")
+        local term = (dialog:getInputText() or ""):gsub("^%s+", "")
         term = term:gsub("%s+$", "")
         if term == "" then return end
         ctx.last_search = term

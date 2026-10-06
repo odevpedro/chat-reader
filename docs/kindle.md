@@ -1,13 +1,16 @@
 # Cliente Kindle (KOReader)
 
-> **Status: Etapa 6 concluída** (falta só o passo em dispositivo). O desenho foi conferido contra o código do KOReader
-> (verificação R5, commit `b539d24` de 2026-09-29) e `kindle/` está escrito e testado
-> com **117 specs** verdes no container (mesmo LuaJIT + ljsqlite3 do dispositivo):
-> store SQLite com migração, lógica de sync transacional, outbox, lógica de biblioteca
-> e leitor (puras, spec'd), navegação do leitor e adapters HTTP/settings. A UI
-> (`main.lua`, biblioteca, leitor, configuração) está escrita. O contrato end-to-end e
-> a Etapa 6 offline estão automatizados (`scripts/contract.sh`, `scripts/offline.sh`).
-> **Falta a validação em emulador/dispositivo.**
+> **Status: Etapas 1–6 concluídas, incluindo o passo em dispositivo** (2026-10-06):
+> O plugin roda no Kindle (KOReader v2026.03) — sync de ponta a ponta validado com o
+> backend real. O desenho foi conferido contra o código do KOReader (verificação R5,
+> commit `b539d24` de 2026-09-29) e `kindle/` está escrito e testado com **137 specs**
+> verdes no container (mesmo LuaJIT + ljsqlite3 do dispositivo): store SQLite com
+> migração, lógica de sync transacional, outbox, lógica de biblioteca e leitor (puras,
+> spec'd), navegação do leitor e adapters HTTP/settings. A UI (`main.lua`, biblioteca,
+> leitor, configuração) está escrita e foi exercitada no aparelho. O contrato end-to-end
+> e a Etapa 6 offline estão automatizados (`scripts/contract.sh`, `scripts/offline.sh`).
+> O que o container não cobre (e-ink, gestos, teclado) já roda no dispositivo, mas a
+> Etapa 7 (refinamento) fica aberta.
 
 ## Princípio: offline-first
 
@@ -22,7 +25,7 @@ o usuário continua lendo, favoritando, criando bookmarks e buscando.
 kindle/
   main.lua              -- WidgetContainer:extend{...} + addToMainMenu, sync, wipe
   client/
-    http.lua            -- porta ClientHttp: Turbo + rapidjson, com token e erros
+    http.lua            -- porta ClientHttp: socket.http sincrono, com token e erros
     settings.lua        -- LuaSettings: base da API, usuário, token, validade, client_id
     sync.lua            -- aplica delta/snapshot (contrato em docs/sync-protocol.md)
     library.lua         -- lógica pura da biblioteca/busca (texto de linha, snippets)
@@ -111,7 +114,7 @@ prova; se a versão-alvo do Kindle diferir, reverificar antes de codar.
 | SQLite | `require("lua-ljsqlite3/init")` → `SQ3.open(path)`; `conn:exec(sql)`, `conn:rowexec(sql)`, `conn:prepare`, `conn:close()` | **é `ljsqlite3`, não `luasql` e não FFI cru**; `exec` aceita vários `;` e indexa o resultado por nome/número de coluna | `doc/DataStore.md`, `frontend/cachesqlite.lua:82` |
 | Transação | `conn:exec('BEGIN;')` … `conn:exec('COMMIT;')` | o delta do sync é aplicado inteiro ou nada | `plugins/statistics.koplugin/main.lua:624,653` |
 | Migrações | padrão `statistics`: `DB_SCHEMA_VERSION` + backup antes de migrar | espelha o Flyway do backend em espírito | `plugins/statistics.koplugin/main.lua:319-332` |
-| HTTP | `require("httpclient"):new():request({url, method, body, headers, on_headers}, cb)` | **assíncrono via turbo**, roda em corrotina; `socketutil` é o cliente síncrono legado | `frontend/httpclient.lua`, `plugins/kosync.koplugin/KOSyncClient.lua:44` |
+| HTTP | `require("socketutil")` + `require("socket.http")` → `socketutil:set_timeout(block, total)`, `http.request{url, method, headers, source, sink}` | **síncrono/bloqueante** com timeout de bloco e total; é o que o frontend usa para chamadas curtas e o que o KOSync usa quando o looper (Turbo) não está rodando | `frontend/socketutil.lua`, `plugins/kosync.koplugin/KOSyncClient.lua:40` |
 | JSON | `require("rapidjson")` → `.decode(s)`, `.encode(t)`, `.array()` | bundled; não há `cjson`/`dkjson` | `plugins/calibre.koplugin/wireless.lua:22` |
 | Conectividade | `require("ui/network/manager")` → `NetworkMgr:isConnected()`, `:isWifiOn()`, `:runWhenOnline(cb)` | o módulo é `ui/network/manager`, **não** `frontend/networkmgr.lua` | `frontend/ui/network/manager.lua:182,187` |
 
@@ -122,9 +125,11 @@ Conclusões que mudam o desenho original:
 - **`Storage:sqlite` não existe.** O mais próximo é `cachesqlite.lua`, que é um cache
   genérico com cota de tamanho — serve para *cache*, não para o banco do plugin, que
   precisa de consultas e transações próprias.
-- O HTTP do KOReader é assíncrono e orientado a corrotina. Por isso `client/http.lua`
-  é uma **porta** com callbacks, não uma chamada bloqueante: é o que permite testar
-  `client/sync.lua` com busted, fora do dispositivo, sem rede.
+- O HTTP do KOReader tem **dois** caminhos. O `httpclient` (Turbo) roda em corrotina e
+  só existe **se** `UIManager.looper` estiver de pé; o `socketutil`/`socket.http` é o
+  caminho síncrono e independe do looper. `client/http.lua` é uma porta do síncrono
+  (LuaSocket) com a mesma interface, o que permite testá-la com busted, fora do
+  dispositivo, com stubs de `socket.http`.
 - Nenhuma limitação bloqueante: SQLite, JSON, HTTP e preferências existem com nomes
   diferentes dos inicialmente previstos. Não há adaptadores de teste "por falta de API";
   eles existem por testabilidade.
@@ -140,7 +145,7 @@ redescobri-las:
 | `bind(nil)` vira `NULL` e **chave de texto aceita NULL** | um payload sem `id` viraria uma linha invisível em vez de erro | `put_chat`/`put_tag`/`put_bookmark` recusam entidade sem `id` |
 | `bind` só aceita string/número | `true` e tabelas levantam `unexpected Lua type` | booleanos são convertidos para `0`/`1` antes de gravar |
 | Concatenar SQL quebra com apóstrofo | mensagem com `'a'` corromperia o INSERT | todo valor de rede entra por prepared statement (`?`) |
-| A resposta do Turbo pode chegar **antes** da espera | no adapter ingênuo, `coroutine.resume(nil)` | `client/http.lua` só retoma a corrotina se ela já existir, e pula o `yield` quando a resposta já está lá |
+| `DUSE_TURBO_LIB = false` no `defaults.lua` do aparelho | neste Kindle (`defaults.lua:195`) o Turbo está desligado → `UIManager:initLooper()` não cria o looper e `httpclient:request()` morre com `attempt to index field 'looper' (a nil value)` — foi o erro que o teste em dispositivo pegou | `client/http.lua` usa o caminho síncrono (`socket.http` + `socketutil`) independente do looper, como o próprio `KOSyncClient` faz quando o looper é `nil` |
 | `busted` do Debian usa `lua5.1` | `require("ffi")` falha, e o ljsqlite3 é FFI | a suíte roda com `luajit` (ver "Como testar") |
 | `list_chats` do SQLite devolvia a linha crua | `message_count`/`updated_at` viravam `nil` e a biblioteca mostrava "sem mensagens" em toda linha; pior, `favorite = 0` virava **favorita**, porque em Lua `0` é verdade | `store/sqlite.lua` traduz a linha para o vocabulário do domínio, e `store/memory.lua` normaliza o mesmo jeito; `spec/library_query_spec.lua` compara os dois stores e falha se divergirem |
 | `nil` como parâmetro bind no ljsqlite3 | `ljsqlite3[range] column index out of range` | `list_chats` só monta `LIMIT ? OFFSET ?` quando há `limit`; sem ele, a query vai sem binds |
@@ -168,16 +173,16 @@ contra o código do KOReader e do binding, não de memória):
   seria executado de novo no arquivo seguinte e quebraria no segundo `ffi.cdef`; por
   isso o script roda **um busted por arquivo**, que é a forma honesta de isolar.
 
-Estado atual: **117 specs** cobrindo store SQLite (schema, migração, CRUD, tags,
+Estado atual: **137 specs** cobrindo store SQLite (schema, migração, CRUD, tags,
 bookmarks, transações), escrita offline e outbox, `client/sync.lua` (delta, paginação,
 snapshot, ack, token que não avança quando a gravação falha), a lógica pura de
 biblioteca e leitor (`client/library.lua`, `client/positions.lua`, navegação de
-`ui/reader.lua`), os adapters de HTTP e settings com `httpclient`/`rapidjson`/
-`luasettings` stubados, e checagem de que todos os arquivos do plugin compilam no
-mesmo LuaJIT do dispositivo (`spec/syntax_spec.lua`, que pega typos que só o device
-veria). Como `ui/library.lua`, `ui/settings.lua` e `main.lua` precisam dos widgets do
-KOReader, elas só passam por `loadfile` (sintaxe); a lógica que merecia teste vive
-fora delas.
+`ui/reader.lua`), os adapters de HTTP e settings com `socket.http`/`socketutil`/
+`rapidjson`/`luasettings` stubados, e checagem de que todos os arquivos do plugin
+compilam no mesmo LuaJIT do dispositivo (`spec/syntax_spec.lua`, que pega typos que só
+o device veria). Como `ui/library.lua`, `ui/settings.lua` e `main.lua` precisam dos
+widgets do KOReader, elas só passam por `loadfile` (sintaxe); a lógica que merecia
+teste vive ao lado delas, e foi exercitada no aparelho (sync, biblioteca e leitor).
 
 ### Contrato e offline contra o backend real
 
